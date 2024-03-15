@@ -1,10 +1,6 @@
 {
-    "name": "JanSharp.Common.Editor",
+    "name": "JanSharp.EditorTools.Editor",
     "references": [
-        "JanSharp.Common",
-        "UdonSharp.Runtime",
-        "UdonSharp.Editor",
-        "VRC.Udon"
     ],
     "includePlatforms": [
         "Editor"
