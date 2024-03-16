@@ -115,10 +115,20 @@ namespace JanSharp
         private void TryKeepAddedChildren(GameObject from, GameObject to)
         {
             bool isPrefab = PrefabUtility.IsAnyPrefabInstanceRoot(from);
-            foreach (Transform child in from.transform)
+            int i = 0;
+            int c = from.transform.childCount;
+            while (i < c)
+            {
+                Transform child = from.transform.GetChild(i);
                 if (!isPrefab || PrefabUtility.IsAddedGameObjectOverride(child.gameObject))
+                {
                     Undo.SetTransformParent(child, to.transform, "moved child for replacement");
                     // child.SetParent(to.transform, worldPositionStays: true);
+                    i--;
+                    c--;
+                }
+                i++;
+            }
         }
     }
 }
