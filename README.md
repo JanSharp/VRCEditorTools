@@ -16,3 +16,4 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
   - All currently selected GameObjects in the hierarchy are affected, if they have a Selectable UI component
   - Yes, Selectable is a base class derived by several other components
 - OcclusionVisibilityWindow to help visualize which objects are occluders and occludees (and static batchers)
+- BulkReplaceWindow to quickly replace many objects with another prefab
