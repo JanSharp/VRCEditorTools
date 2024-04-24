@@ -19,12 +19,12 @@ namespace JanSharp
 
         private static void SelectMode(ParticleSystemCullingMode mode)
         {
-            Selection.objects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
+            List<ParticleSystem> pss = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
                 .SelectMany(go => go.GetComponentsInChildren<ParticleSystem>())
                 .Where(ps => ps.main.cullingMode == mode)
-                .Select(ps => ps.gameObject)
-                .Distinct()
-                .ToArray();
+                .ToList();
+            Debug.Log($"Selecting {pss.Count} Particle Systems with mode: {mode.ToString()}");
+            Selection.objects = pss.Select(ps => ps.gameObject).Distinct().ToArray();
         }
     }
 }
