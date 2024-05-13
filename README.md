@@ -18,3 +18,4 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
 - OcclusionVisibilityWindow to help visualize which objects are occluders and occludees (and static batchers)
 - BulkReplaceWindow to quickly replace many objects with another prefab
 - Select Particle Systems based on their culling mode
+- Save Pending Asset Changes is a tiny editor script to write any unsaved asset file changes to the drive
