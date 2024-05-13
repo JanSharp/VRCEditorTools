@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.0.4] - 2024-05-13
+
+### Added
+
+- Add editor script to save pending asset changes to the drive ([`368b962`](https://github.com/JanSharp/VRCEditorTools/commit/368b962cb237c536a2d3c7ac3d5d2d2cc57bd663))
+
 ## [1.0.3] - 2024-04-24
 
 ### Changed
@@ -32,6 +38,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.0.4]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.4
 [1.0.3]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.3
 [1.0.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.2
 [1.0.1]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.1
