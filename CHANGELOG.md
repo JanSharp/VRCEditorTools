@@ -1,6 +1,16 @@
 
 # Changelog
 
+## [1.0.5] - 2024-05-17
+
+### Changed
+
+- Improve readme line for Save Pending Changes ([`38faa0c`](https://github.com/JanSharp/VRCEditorTools/commit/38faa0c7d7a6e536fa62ee108de4fb53e100ce5b))
+
+### Added
+
+- Add Create Parent menu item next to Create Empty ([`7b90b07`](https://github.com/JanSharp/VRCEditorTools/commit/7b90b070ad1f6d0f8e6d7d0f73af182b4160537f))
+
 ## [1.0.4] - 2024-05-13
 
 ### Added
@@ -38,6 +48,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.0.5]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.5
 [1.0.4]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.4
 [1.0.3]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.3
 [1.0.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.2
