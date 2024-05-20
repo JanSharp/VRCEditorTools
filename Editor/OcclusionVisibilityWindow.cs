@@ -9,7 +9,7 @@ namespace JanSharp
 {
     public class OcclusionVisibilityWindow : EditorWindow
     {
-        [MenuItem("Tools/Occlusion Visibility")]
+        [MenuItem("Tools/JanSharp/Occlusion Visibility", false, 1000)]
         public static void ShowVisibilityWindow()
         {
             // This method is called when the user selects the menu item in the Editor

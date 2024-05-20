@@ -5,7 +5,7 @@ namespace JanSharp
 {
     public static class SavePendingAssetChanges
     {
-        [MenuItem("Tools/Save Pending Asset Changes")]
+        [MenuItem("Tools/JanSharp/Save Pending Asset Changes", false, 1000)]
         public static void DoSavePendingAssetChanges()
         {
             AssetDatabase.SaveAssets();

@@ -9,7 +9,7 @@ namespace JanSharp
 {
     public static class UIColorsChanger
     {
-        [MenuItem("Tools/Update Selected UI Colors")]
+        [MenuItem("Tools/JanSharp/Update Selected UI Colors", false, 1000)]
         public static void UpdateUIColors()
         {
             foreach (Selectable selectable in Selection.gameObjects.SelectMany(go => go.GetComponents<Selectable>()))
