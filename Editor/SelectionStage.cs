@@ -16,7 +16,7 @@ namespace JanSharp
         private List<object> listViewSelected;
         private IEnumerable<GameObject> SelectedGameObjects => listViewSelected.Where(obj => obj != null).Cast<GameObject>();
 
-        [MenuItem("Tools/JanSharp/Selection Stage", false, 1000)]
+        [MenuItem("Tools/JanSharp/Selection Stage", false, 980)]
         public static void ShowSelectionStage()
         {
             // This method is called when the user selects the menu item in the Editor

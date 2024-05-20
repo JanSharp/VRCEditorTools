@@ -20,7 +20,7 @@ namespace JanSharp
         [SerializeField] Vector3 worldRotationOffset;
         [SerializeField] bool keepChildrenPostWorldShift = false;
 
-        [MenuItem("Tools/JanSharp/Bulk Replace", false, 1000)]
+        [MenuItem("Tools/JanSharp/Bulk Replace", false, 980)]
         public static void ShowBulkReplaceWindow()
         {
             // This method is called when the user selects the menu item in the Editor
