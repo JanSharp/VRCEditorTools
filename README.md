@@ -22,3 +22,4 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
 - Create Parent menu item next to Create Empty, creating an empty game object which becomes the parent of all selected objects
 - Selection Stage editor window to effectively have a second much more manually controlled list of selected objects
 - Log Component Class names to quickly get the component names to be able to search for all objects with that component in the scene
+- Property Search window which allows searching through all components filtered by the value of a given property
