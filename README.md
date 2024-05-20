@@ -23,3 +23,4 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
 - Selection Stage editor window to effectively have a second much more manually controlled list of selected objects
 - Log Component Class names to quickly get the component names to be able to search for all objects with that component in the scene
 - Property Search window which allows searching through all components filtered by the value of a given property
+- Show (Non) Selected Only (plus show/hide all) menu items to quickly show or hide only specific objects in the scene, without affecting their active state (inactive objects cannot be shown like this, naturally/unfortunately)
