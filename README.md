@@ -25,3 +25,5 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
 - Print Selected Count to simply figure out how many objects are selected
 - Property Search window which allows searching through all components filtered by the value of a given property
 - Show (Non) Selected Only (plus show/hide all) menu items to quickly show or hide only specific objects in the scene, without affecting their active state (inactive objects cannot be shown like this, naturally/unfortunately)
+- Generate Basic Culling LODs to quickly generate LOD Groups for selected objects simply culling all renderers at 4%
+- Copy/Paste Cull Percentage in the context menu for LOD Groups to quickly modify culling distances for multiple basic culling LOD Groups
