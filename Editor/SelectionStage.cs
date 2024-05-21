@@ -12,10 +12,10 @@ namespace JanSharp
 {
     public class SelectionStage : EditorWindow
     {
-        private List<GameObject> staged;
-        private HashSet<GameObject> stagedLut;
+        private List<GameObject> staged = new List<GameObject>();
+        private HashSet<GameObject> stagedLut = new HashSet<GameObject>();
         private ListView listView;
-        private List<object> listViewSelected;
+        private List<object> listViewSelected = new List<object>();
         private IEnumerable<GameObject> SelectedInStage => listViewSelected.Any(obj => obj != null)
             ? listViewSelected.Where(obj => obj != null).Cast<GameObject>()
             : staged;
@@ -31,11 +31,6 @@ namespace JanSharp
 
         private void CreateGUI()
         {
-            // TODO: don't reset here because every recompile causes the stage to get cleared because of this.
-            staged = new List<GameObject>();
-            stagedLut = new HashSet<GameObject>();
-            listViewSelected = new List<object>(); // Just to make it never be null.
-
             VisualElement root = rootVisualElement;
 
             Box listBox = new Box() { style = { flexGrow = 1f } };
