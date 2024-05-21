@@ -138,7 +138,7 @@ namespace JanSharp
             if (componentName == "" && choosingFromObject != null)
             {
                 EditorGUILayout.Separator();
-                foreach (Component component in choosingFromObject.GetComponents<Component>())
+                foreach (Component component in choosingFromObject.GetComponents<Component>().Where(c => c != null))
                 {
                     string name = component.GetType().Name;
                     if (GUILayout.Button(new GUIContent(name)))
@@ -328,7 +328,7 @@ namespace JanSharp
             System.Type componentType = typeof(Component);
             foreach (Component component in UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().GetRootGameObjects()
                 .SelectMany(go => go.GetComponentsInChildren<Component>())
-                .Where(c => c.GetType().Name == componentName && !toSelect.Contains(c.gameObject)))
+                .Where(c => c != null && c.GetType().Name == componentName && !toSelect.Contains(c.gameObject)))
             {
                 SerializedObject componentProxy = new SerializedObject(component);
                 SerializedProperty property = componentProxy.FindProperty(propertyName);
