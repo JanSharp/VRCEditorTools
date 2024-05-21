@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace JanSharp
 {
-    public class PropertySearch : EditorWindow
+    public class PropertySearchWindow : EditorWindow
     {
         private static string[] propertyTypeStrings = new string[]
         {
@@ -104,13 +104,13 @@ namespace JanSharp
         [SerializeField] private BoundsInt boundsIntValue;
 
         private int foundCount = -1;
-        private SelectionStage selectionStage;
+        private SelectionStageWindow selectionStage;
 
         [MenuItem("Tools/JanSharp/Property Search Window", priority = 500)]
-        public static void ShowPropertySearch()
+        public static void ShowPropertySearchWindow()
         {
             // This method is called when the user selects the menu item in the Editor
-            EditorWindow wnd = GetWindow<PropertySearch>();
+            EditorWindow wnd = GetWindow<PropertySearchWindow>();
             wnd.titleContent = new GUIContent("Property Search");
         }
 
@@ -345,7 +345,7 @@ namespace JanSharp
                 return;
             if (selectionStage == null)
             {
-                selectionStage = CreateWindow<SelectionStage>(typeof(PropertySearch));
+                selectionStage = CreateWindow<SelectionStageWindow>(typeof(PropertySearchWindow));
                 selectionStage.titleContent = new GUIContent("Results Stage");
             }
             selectionStage.SetStage(results);

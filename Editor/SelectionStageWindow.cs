@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace JanSharp
 {
-    public class SelectionStage : EditorWindow
+    public class SelectionStageWindow : EditorWindow
     {
         // This id is purely needed in order to keep stagedLut in sync with staged while having undo and redo
         // support, without having to regenerate the lut every time it is used, as well as only refreshing the
@@ -40,10 +40,10 @@ namespace JanSharp
         private Label countLabel;
 
         [MenuItem("Tools/JanSharp/Selection Stage Window", priority = 500)]
-        public static void ShowSelectionStage()
+        public static void ShowSelectionStageWindow()
         {
             // This method is called when the user selects the menu item in the Editor
-            EditorWindow window = CreateInstance<SelectionStage>();
+            EditorWindow window = CreateInstance<SelectionStageWindow>();
             window.titleContent = new GUIContent("Selection Stage");
             window.Show();
         }
