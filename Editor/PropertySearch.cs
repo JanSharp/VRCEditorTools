@@ -104,6 +104,7 @@ namespace JanSharp
         [SerializeField] private BoundsInt boundsIntValue;
 
         private int foundCount = -1;
+        private SelectionStage selectionStage;
 
         [MenuItem("Tools/JanSharp/Property Search Window", priority = 500)]
         public static void ShowPropertySearch()
@@ -181,8 +182,10 @@ namespace JanSharp
 
             EditorGUILayout.Separator();
 
-            if (GUILayout.Button(new GUIContent("Search")))
-                Search();
+            if (GUILayout.Button(new GUIContent("Search And Select")))
+                SearchAndSelect();
+            if (GUILayout.Button(new GUIContent("Search Into Selection Stage")))
+                SearchIntoSelectionStage();
 
             if (foundCount != -1)
             {
@@ -330,7 +333,27 @@ namespace JanSharp
             }
         }
 
-        private void Search()
+        private void SearchAndSelect()
+        {
+            Selection.objects = Search().ToArray();
+        }
+
+        private void SearchIntoSelectionStage()
+        {
+            ICollection<GameObject> results = Search();
+            if (results.Count == 0)
+                return;
+            if (selectionStage == null)
+            {
+                selectionStage = CreateWindow<SelectionStage>(typeof(PropertySearch));
+                selectionStage.titleContent = new GUIContent("Results Stage");
+            }
+            selectionStage.SetStage(results);
+            selectionStage.Show();
+            selectionStage.Focus();
+        }
+
+        private HashSet<GameObject> Search()
         {
             HashSet<GameObject> toSelect = new HashSet<GameObject>();
             System.Type componentType = typeof(Component);
@@ -350,7 +373,7 @@ namespace JanSharp
                 toSelect.Add(component.gameObject);
             }
             foundCount = toSelect.Count;
-            Selection.objects = toSelect.ToArray();
+            return toSelect;
         }
 
         private bool ComparePropertyValue(SerializedProperty property)

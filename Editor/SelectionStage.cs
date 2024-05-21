@@ -340,5 +340,11 @@ namespace JanSharp
             listView.selectedIndex = -1;
             RefreshList();
         }
+
+
+        public void SetStage(ICollection<GameObject> newStage)
+        {
+            OverwriteStageEntirely(newStage);
+        }
     }
 }
