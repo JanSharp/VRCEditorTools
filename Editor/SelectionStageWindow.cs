@@ -6,7 +6,6 @@ using System.Linq;
 
 // TODO: Figure out how tooltips work.
 // TODO: Once upgrading to 2022 add more and better selection support within the stage.
-// TODO: sort - alphabetically, case insensitive
 // TODO: dedup - remove objects part of the same prefab
 
 namespace JanSharp
@@ -129,6 +128,7 @@ namespace JanSharp
                 IMGUIContainer column = new IMGUIContainer() { style = { flexGrow = 1f } };
                 column.Add(new Label("Within Stage") { style = { alignSelf = Align.Center } });
                 column.Add(new Button(DeselectWithinStage) { text = "Deselect" });
+                column.Add(new Button(SortWithinStage) { text = "Sort" });
                 column.Add(new Button(RemoveWithinStage) { text = "Remove" });
                 column.Add(new Button(ClearStage) { text = "Clear" });
                 countLabel = new Label(GetCountLabelText())
@@ -322,6 +322,25 @@ namespace JanSharp
         private void DeselectWithinStage()
         {
             listView.selectedIndex = -1;
+        }
+
+        private class GameObjectComparer : Comparer<GameObject>
+        {
+            public override int Compare(GameObject x, GameObject y)
+            {
+                return x.name.ToLower().CompareTo(y.name.ToLower());
+            }
+        }
+
+        private void SortWithinStage()
+        {
+            Cleanup();
+            BeginUndoAbleOperation("Sort Selection Stage");
+            staged.Sort(new GameObjectComparer());
+            EndUndoAbleOperation();
+            MarkStagedLutAsUpToDate();
+            listView.selectedIndex = -1;
+            RefreshList();
         }
 
         private void RemoveWithinStage()
