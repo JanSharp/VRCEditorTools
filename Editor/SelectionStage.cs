@@ -46,6 +46,8 @@ namespace JanSharp
                 selectionType = SelectionType.Multiple,
             };
             listView.onItemChosen += obj => {
+                if (obj == null)
+                    return;
                 GameObject go = (GameObject)obj;
                 EditorGUIUtility.PingObject(go); // Jump to in hierarchy, without selecting.
                 var prev = Selection.objects;
