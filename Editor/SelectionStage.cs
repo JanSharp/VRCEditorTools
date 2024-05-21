@@ -35,6 +35,7 @@ namespace JanSharp
         private IEnumerable<GameObject> SelectedInStage => listViewSelected.Any(obj => obj != null)
             ? listViewSelected.Where(obj => obj != null).Cast<GameObject>()
             : staged;
+        private Label countLabel;
 
         [MenuItem("Tools/JanSharp/Selection Stage", priority = 980)]
         public static void ShowSelectionStage()
@@ -78,7 +79,10 @@ namespace JanSharp
                     RefreshList();
                 }
             };
-            listView.onSelectionChanged += selected => listViewSelected = selected;
+            listView.onSelectionChanged += selected => {
+                listViewSelected = selected;
+                countLabel.text = GetCountLabelText();
+            };
             listBox.Add(listView);
 
             root.Add(listBox);
@@ -125,6 +129,15 @@ namespace JanSharp
                 column.Add(new Button(DeselectWithinStage) { text = "Deselect" });
                 column.Add(new Button(RemoveWithinStage) { text = "Remove" });
                 column.Add(new Button(ClearStage) { text = "Clear" });
+                countLabel = new Label(GetCountLabelText())
+                {
+                    style = {
+                        alignSelf = Align.Center,
+                        unityTextAlign = TextAnchor.UpperCenter,
+                        paddingTop = 2f,
+                    },
+                };
+                column.Add(countLabel);
                 buttonColumns.Add(column);
             }
 
@@ -157,11 +170,20 @@ namespace JanSharp
         {
             lastRefreshedUniqueStateId = currentUniqueStateId;
             listView.Refresh();
+            countLabel.text = GetCountLabelText();
         }
 
         private void BeginUndoAbleOperation(string name)
         {
             Undo.RecordObject(this, name);
+        }
+
+        private string GetCountLabelText()
+        {
+            int selectedCount = SelectedInStage.Count();
+            return selectedCount == 0 || selectedCount == staged.Count
+                ? $"count:\n{staged.Count}"
+                : $"count:\n{selectedCount}/{staged.Count}";
         }
 
         private void EndUndoAbleOperation()
