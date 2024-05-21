@@ -1,6 +1,25 @@
 
 # Changelog
 
+## [1.1.0] - 2024-05-21
+
+_Make sure to close The Bulk Replace Window before updating, due to a class name change._
+
+### Changed
+
+- **Breaking:** Rename window classes to have the Window postfix ([`4018fa5`](https://github.com/JanSharp/VRCEditorTools/commit/4018fa55bf10d12b2fa6d74d8345cb09e5e60470))
+- **Breaking:** Rename Save Pending Asset Changes to Save Cached Unity Asset Changes for clarity ([`05a0920`](https://github.com/JanSharp/VRCEditorTools/commit/05a092024f72549d6c4ee96879884c5196ba6833))
+- Move all tools under Tools/JanSharp and rearrange them ([`3c01b56`](https://github.com/JanSharp/VRCEditorTools/commit/3c01b566b96fda508e702154daa0f3cafabfabf3), [`accc270`](https://github.com/JanSharp/VRCEditorTools/commit/accc27060b69f451320eee64af4f98384da77768), [`a2441b2`](https://github.com/JanSharp/VRCEditorTools/commit/a2441b2ec47825f78351dd011f2d684e5adc8128))
+
+### Added
+
+- Add Selection Stage editor window ([`e7d1d4c`](https://github.com/JanSharp/VRCEditorTools/commit/e7d1d4c385f76a24f84c8f5b778031f07dbbf0d5), [`a73b30f`](https://github.com/JanSharp/VRCEditorTools/commit/a73b30f679b05cbff222621a57f789847c585984), [`0857508`](https://github.com/JanSharp/VRCEditorTools/commit/08575083da6a08f1a8d34467c3f4eec01eade29d), [`a09ac61`](https://github.com/JanSharp/VRCEditorTools/commit/a09ac6101013f1c17eb0eeb2ffc80168d681a895), [`2a8cb46`](https://github.com/JanSharp/VRCEditorTools/commit/2a8cb466312515f6542780357aeb5cc0ecfd3bc9), [`2a253c7`](https://github.com/JanSharp/VRCEditorTools/commit/2a253c767f50b72736158b76e242ca97699a9230), [`cca7d3e`](https://github.com/JanSharp/VRCEditorTools/commit/cca7d3e62f77ea795354a5d0c674046c9089bd70), [`3d9090d`](https://github.com/JanSharp/VRCEditorTools/commit/3d9090df66fa797a4874545ab10c9a1ad76928f0))
+- Add Property Search window to find components where a given property has some value ([`262bbb7`](https://github.com/JanSharp/VRCEditorTools/commit/262bbb7f52760c2c884123a9862638aa8bf7f796), [`6332a6e`](https://github.com/JanSharp/VRCEditorTools/commit/6332a6e1c584391e63d6f350796e17bbcfc50cde), [`760beb7`](https://github.com/JanSharp/VRCEditorTools/commit/760beb79e2bd6714a884d2f8d75ab4b100ded276), [`cca7d3e`](https://github.com/JanSharp/VRCEditorTools/commit/cca7d3e62f77ea795354a5d0c674046c9089bd70))
+- Add generation of basic culling LOD Groups and context menu items to copy paste cull percentages on multiple LOD Groups at once ([`7514075`](https://github.com/JanSharp/VRCEditorTools/commit/75140753b7d4ec06f03fc03e9ed8290eb157e5d6))
+- Add menu items to show/hide all/selected game objects and one to invert visibility ([`1e54005`](https://github.com/JanSharp/VRCEditorTools/commit/1e5400589b2831c6b5145fc48f6477cd17e6820d), [`a2441b2`](https://github.com/JanSharp/VRCEditorTools/commit/a2441b2ec47825f78351dd011f2d684e5adc8128))
+- Add Print Selected Count menu item ([`4daef4a`](https://github.com/JanSharp/VRCEditorTools/commit/4daef4aa80db918a7cb882067a4d4f0e140c2fca))
+- Add Print Component Class Names menu item ([`da6428d`](https://github.com/JanSharp/VRCEditorTools/commit/da6428d7d0a7733c484e4d250e922ed5287b2b0a), [`bf84889`](https://github.com/JanSharp/VRCEditorTools/commit/bf84889a683353e43f762d615a7884329b47af39), [`17ec4f6`](https://github.com/JanSharp/VRCEditorTools/commit/17ec4f63e529a637462e50704384612c801638a0))
+
 ## [1.0.5] - 2024-05-17
 
 ### Changed
@@ -48,6 +67,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.1.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.0
 [1.0.5]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.5
 [1.0.4]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.4
 [1.0.3]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.3
