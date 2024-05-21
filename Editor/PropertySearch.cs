@@ -103,7 +103,7 @@ namespace JanSharp
         [SerializeField] private RectInt rectIntValue;
         [SerializeField] private BoundsInt boundsIntValue;
 
-        [MenuItem("Tools/JanSharp/Property Search", isValidateFunction: false, priority: 980)]
+        [MenuItem("Tools/JanSharp/Property Search Window", priority = 500)]
         public static void ShowPropertySearch()
         {
             // This method is called when the user selects the menu item in the Editor

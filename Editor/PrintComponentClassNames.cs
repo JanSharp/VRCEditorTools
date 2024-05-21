@@ -9,13 +9,13 @@ namespace JanSharp
 {
     public static class PrintComponentClassNames
     {
-        [MenuItem("Tools/JanSharp/Print Component Class Names", isValidateFunction: true, priority: 1000)]
+        [MenuItem("Tools/JanSharp/Print Component Class Names", isValidateFunction: true, priority = 1000)]
         public static bool ValidateDoPrintComponentClassNames()
         {
             return Selection.activeGameObject != null;
         }
 
-        [MenuItem("Tools/JanSharp/Print Component Class Names", isValidateFunction: false, priority: 1000)]
+        [MenuItem("Tools/JanSharp/Print Component Class Names", priority = 1000)]
         public static void DoPrintComponentClassNames()
         {
             string components = string.Join(", ", Selection.activeGameObject.GetComponents<Component>()

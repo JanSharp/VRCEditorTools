@@ -6,6 +6,8 @@ using System.Linq;
 
 // TODO: Figure out how tooltips work.
 // TODO: Once upgrading to 2022 add more and better selection support within the stage.
+// TODO: sort - alphabetically, case insensitive
+// TODO: dedup - remove objects part of the same prefab
 
 namespace JanSharp
 {
@@ -37,7 +39,7 @@ namespace JanSharp
             : staged;
         private Label countLabel;
 
-        [MenuItem("Tools/JanSharp/Selection Stage", priority = 980)]
+        [MenuItem("Tools/JanSharp/Selection Stage Window", priority = 500)]
         public static void ShowSelectionStage()
         {
             // This method is called when the user selects the menu item in the Editor

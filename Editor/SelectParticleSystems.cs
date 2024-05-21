@@ -8,13 +8,13 @@ namespace JanSharp
 {
     public static class SelectParticleSystems
     {
-        [MenuItem("Tools/JanSharp/Select Particle - Automatic", false, 1020)]
+        [MenuItem("Tools/JanSharp/Select Particle - Automatic", priority = 1500)]
         public static void SelectAutomatic() => SelectMode(ParticleSystemCullingMode.Automatic);
-        [MenuItem("Tools/JanSharp/Select Particle - Pause And Catch-up", false, 1020)]
+        [MenuItem("Tools/JanSharp/Select Particle - Pause And Catch-up", priority = 1500)]
         public static void SelectPauseAndCatchup() => SelectMode(ParticleSystemCullingMode.PauseAndCatchup);
-        [MenuItem("Tools/JanSharp/Select Particle - Pause", false, 1020)]
+        [MenuItem("Tools/JanSharp/Select Particle - Pause", priority = 1500)]
         public static void SelectPause() => SelectMode(ParticleSystemCullingMode.Pause);
-        [MenuItem("Tools/JanSharp/Select Particle - Always Simulate", false, 1020)]
+        [MenuItem("Tools/JanSharp/Select Particle - Always Simulate", priority = 1500)]
         public static void SelectAlwaysSimulate() => SelectMode(ParticleSystemCullingMode.AlwaysSimulate);
 
         private static void SelectMode(ParticleSystemCullingMode mode)

@@ -5,13 +5,13 @@ namespace JanSharp
 {
     public static class CreateParent
     {
-        [MenuItem("GameObject/Create Parent", true, 0)]
+        [MenuItem("GameObject/Create Parent", isValidateFunction: true, priority = 0)]
         public static bool DoCreateParentValidation()
         {
             return Selection.activeGameObject != null;
         }
 
-        [MenuItem("GameObject/Create Parent", false, 0)]
+        [MenuItem("GameObject/Create Parent", priority = 0)]
         public static void DoCreateParent(MenuCommand menuCommand)
         {
             // Prevent it from running multiple times.
