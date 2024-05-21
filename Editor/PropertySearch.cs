@@ -103,6 +103,8 @@ namespace JanSharp
         [SerializeField] private RectInt rectIntValue;
         [SerializeField] private BoundsInt boundsIntValue;
 
+        private int foundCount = -1;
+
         [MenuItem("Tools/JanSharp/Property Search Window", priority = 500)]
         public static void ShowPropertySearch()
         {
@@ -119,7 +121,7 @@ namespace JanSharp
 
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
-            if (GUILayout.Button(new GUIContent("Choose from selected")))
+            if (GUILayout.Button(new GUIContent("Choose From Selected")))
             {
                 if (Selection.activeGameObject == null)
                     showSelectedInfoMsg = true;
@@ -133,7 +135,7 @@ namespace JanSharp
                 }
             }
             if (showSelectedInfoMsg)
-                GUILayout.Label(new GUIContent("Must have selected a game object."));
+                GUILayout.Label(new GUIContent("Must have a game object selected."));
 
             if (componentName == "" && choosingFromObject != null)
             {
@@ -181,6 +183,12 @@ namespace JanSharp
 
             if (GUILayout.Button(new GUIContent("Search")))
                 Search();
+
+            if (foundCount != -1)
+            {
+                EditorGUILayout.Separator();
+                GUILayout.Label($"Found Count: {foundCount}");
+            }
 
             EditorGUILayout.EndScrollView();
         }
@@ -341,6 +349,7 @@ namespace JanSharp
                 // Found a match!
                 toSelect.Add(component.gameObject);
             }
+            foundCount = toSelect.Count;
             Selection.objects = toSelect.ToArray();
         }
 
