@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using System.Linq;
 
-// TODO: Undo support for changes within the selection stage!
 // TODO: Figure out how tooltips work.
 // TODO: Once upgrading to 2022 add more and better selection support within the stage.
 
@@ -12,8 +11,25 @@ namespace JanSharp
 {
     public class SelectionStage : EditorWindow
     {
-        private List<GameObject> staged = new List<GameObject>();
+        // This id is purely needed in order to keep stagedLut in sync with staged while having undo and redo
+        // support, without having to regenerate the lut every time it is used, as well as only refreshing the
+        // UI when an undo/redo actually modified the stage.
+        [SerializeField] private ulong currentUniqueStateId = 0uL;
+        [SerializeField] private List<GameObject> staged = new List<GameObject>();
+        private ulong nextUniqueStateId = 1uL;
+        private ulong lastRefreshedUniqueStateId = 0uL;
+        private ulong stagedLutAssociatedUniqueStateId = 0uL;
         private HashSet<GameObject> stagedLut = new HashSet<GameObject>();
+        private HashSet<GameObject> StagedLut
+        {
+            get
+            {
+                if (stagedLutAssociatedUniqueStateId == currentUniqueStateId)
+                    return stagedLut;
+                stagedLut = new HashSet<GameObject>(staged);
+                return stagedLut;
+            }
+        }
         private ListView listView;
         private List<object> listViewSelected = new List<object>();
         private IEnumerable<GameObject> SelectedInStage => listViewSelected.Any(obj => obj != null)
@@ -59,7 +75,7 @@ namespace JanSharp
                     // When double clicking a single element, clear the selection again as to prevent
                     // accidentally narrowing the stage through having only 1 element selected.
                     listView.selectedIndex = -1;
-                    listView.Refresh();
+                    RefreshList();
                 }
             };
             listView.onSelectionChanged += selected => listViewSelected = selected;
@@ -114,39 +130,9 @@ namespace JanSharp
 
             buttonsBox.Add(buttonColumns);
             root.Add(buttonsBox);
-        }
 
-        private void RemoveObjectsFromStage(IEnumerable<GameObject> toRemove, bool inverted = false)
-        {
-            if (!inverted && !toRemove.Any())
-                return;
-            int c = staged.Count;
-            int newI = 0;
-            for (int i = 0; i < c; i++)
-            {
-                GameObject go = staged[i];
-                if (toRemove.Contains(go) != inverted)
-                    stagedLut.Remove(go);
-                else
-                    staged[newI++] = go;
-            }
-            staged.RemoveRange(newI, c - newI);
-            listView.selectedIndex = -1;
-            listView.Refresh();
-        }
-
-        private void OverwriteStageEntirely(ICollection<GameObject> newSelection)
-        {
-            staged.Clear();
-            staged.AddRange(newSelection);
-            stagedLut = new HashSet<GameObject>(staged);
-            listView.selectedIndex = -1;
-            listView.Refresh();
-        }
-
-        private void Cleanup()
-        {
-            RemoveObjectsFromStage(staged.Where(go => go == null));
+            Undo.undoRedoPerformed -= OnUndoRedo;
+            Undo.undoRedoPerformed += OnUndoRedo;
         }
 
         private void OnHierarchyChange()
@@ -154,17 +140,94 @@ namespace JanSharp
             Cleanup();
         }
 
+        private void OnUndoRedo()
+        {
+            if (lastRefreshedUniqueStateId == currentUniqueStateId)
+                return;
+            RefreshList();
+        }
+
+        private void OnDestroy()
+        {
+            // Who knows if this is actually required, but I think it's clean.
+            Undo.undoRedoPerformed -= OnUndoRedo;
+        }
+
+        private void RefreshList()
+        {
+            lastRefreshedUniqueStateId = currentUniqueStateId;
+            listView.Refresh();
+        }
+
+        private void BeginUndoAbleOperation(string name)
+        {
+            Undo.RecordObject(this, name);
+        }
+
+        private void EndUndoAbleOperation()
+        {
+            currentUniqueStateId = nextUniqueStateId++;
+            lastRefreshedUniqueStateId = currentUniqueStateId;
+        }
+
+        private void MarkStagedLutAsUpToDate()
+        {
+            stagedLutAssociatedUniqueStateId = currentUniqueStateId;
+        }
+
+        private void RemoveObjectsFromStage(IEnumerable<GameObject> toRemove, bool inverted = false)
+        {
+            if (!inverted && !toRemove.Any())
+                return;
+            BeginUndoAbleOperation("Removed from Selection Stage");
+            int c = staged.Count;
+            int newI = 0;
+            for (int i = 0; i < c; i++)
+            {
+                GameObject go = staged[i];
+                if (toRemove.Contains(go) != inverted)
+                    StagedLut.Remove(go);
+                else
+                    staged[newI++] = go;
+            }
+            staged.RemoveRange(newI, c - newI);
+            EndUndoAbleOperation();
+            MarkStagedLutAsUpToDate();
+            listView.selectedIndex = -1;
+            RefreshList();
+        }
+
+        private void OverwriteStageEntirely(ICollection<GameObject> newSelection)
+        {
+            BeginUndoAbleOperation("Set Selection State");
+            staged.Clear();
+            staged.AddRange(newSelection);
+            stagedLut = new HashSet<GameObject>(staged);
+            EndUndoAbleOperation();
+            MarkStagedLutAsUpToDate();
+            listView.selectedIndex = -1;
+            RefreshList();
+        }
+
+        private void Cleanup()
+        {
+            RemoveObjectsFromStage(staged.Where(go => go == null));
+        }
+
 
         private void AddToStage()
         {
+            BeginUndoAbleOperation("Add to Selection Stage");
             foreach (GameObject go in Selection.gameObjects)
             {
-                if (stagedLut.Contains(go))
+                if (StagedLut.Contains(go))
                     continue;
-                stagedLut.Add(go);
+                StagedLut.Add(go);
                 staged.Add(go);
             }
-            listView.Refresh();
+            EndUndoAbleOperation();
+            MarkStagedLutAsUpToDate();
+            RefreshList();
         }
 
         private void ExcludeFromStage()
@@ -245,9 +308,13 @@ namespace JanSharp
 
         private void ClearStage()
         {
+            BeginUndoAbleOperation("Clear Selection Stage");
             staged.Clear();
             stagedLut.Clear();
-            listView.Refresh();
+            EndUndoAbleOperation();
+            MarkStagedLutAsUpToDate();
+            listView.selectedIndex = -1;
+            RefreshList();
         }
     }
 }
