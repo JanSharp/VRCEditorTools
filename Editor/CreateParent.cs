@@ -28,9 +28,9 @@ namespace JanSharp
             // to run every time you right click in the hierarchy because this is O(n) where n is the amount
             // of selected objects.
             foreach (GameObject go in selected)
-                if (PrefabUtility.IsPartOfAnyPrefab(go) && !PrefabUtility.IsOutermostPrefabInstanceRoot(go))
+                if (PrefabUtility.IsPartOfImmutablePrefab(go) && !PrefabUtility.IsOutermostPrefabInstanceRoot(go))
                 {
-                    Debug.LogError("Cannot create parent for game objects which are part of prefabs.", go);
+                    Debug.LogError("Cannot create parent for game objects which are part of immutable prefabs.", go);
                     return;
                 }
 
