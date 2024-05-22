@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.1.2] - 2024-05-22
+
+### Changed
+
+- Remove Create Parent prefab restrictions entirely ([`a61bbff`](https://github.com/JanSharp/VRCEditorTools/commit/a61bbff9740b2846d531412dadc07b6f7fd152aa))
+
 ## [1.1.1] - 2024-05-22
 
 ### Changed
@@ -73,6 +79,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.1.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.2
 [1.1.1]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.1
 [1.1.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.0
 [1.0.5]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.5
