@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.1.1] - 2024-05-22
+
+### Changed
+
+- Loosen restriction on when Create Parent is usable, only children of immutable prefabs get rejected ([`cb51dd7`](https://github.com/JanSharp/VRCEditorTools/commit/cb51dd7d2b5b6a436553d102be2df16bedf81329))
+
 ## [1.1.0] - 2024-05-21
 
 _Make sure to close The Bulk Replace Window before updating, due to a class name change._
@@ -67,6 +73,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.1.1]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.1
 [1.1.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.0
 [1.0.5]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.5
 [1.0.4]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.0.4
