@@ -24,15 +24,15 @@ namespace JanSharp
                 return;
 
             GameObject[] selected = Selection.gameObjects;
-            // Doing validation here instead of the validation function because I do not want this validation
-            // to run every time you right click in the hierarchy because this is O(n) where n is the amount
-            // of selected objects.
-            foreach (GameObject go in selected)
-                if (PrefabUtility.IsPartOfImmutablePrefab(go) && !PrefabUtility.IsOutermostPrefabInstanceRoot(go))
-                {
-                    Debug.LogError("Cannot create parent for game objects which are part of immutable prefabs.", go);
-                    return;
-                }
+            // // Doing validation here instead of the validation function because I do not want this validation
+            // // to run every time you right click in the hierarchy because this is O(n) where n is the amount
+            // // of selected objects.
+            // foreach (GameObject go in selected)
+            //     if (PrefabUtility.IsPartOfImmutablePrefab(go) && !PrefabUtility.IsOutermostPrefabInstanceRoot(go))
+            //     {
+            //         Debug.LogError("Cannot create parent for game objects which are part of immutable prefabs.", go);
+            //         return;
+            //     }
 
             GameObject parentGo = new GameObject();
             // I'd have loved to use the game object which was right clicked, however the menu item function
