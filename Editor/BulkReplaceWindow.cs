@@ -72,6 +72,11 @@ namespace JanSharp
                 Replace(selected);
         }
 
+        private void OnSelectionChange()
+        {
+            this.Repaint();
+        }
+
         private void Replace(GameObject[] toReplace)
         {
             if (toReplace.Length == 0)
