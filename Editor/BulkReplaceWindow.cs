@@ -6,15 +6,16 @@ namespace JanSharp
 {
     public class BulkReplaceWindow : EditorWindow
     {
-        GameObject prefab;
-        [SerializeField] bool keepCountPostfix = true;
-        [SerializeField] Vector3 localPositionOffset;
-        [SerializeField] Vector3 localRotationOffset;
-        [SerializeField] float localScaleMultiplier = 1f;
-        [SerializeField] bool keepChildrenPostLocalShift = false;
-        [SerializeField] Vector3 worldPositionOffset;
-        [SerializeField] Vector3 worldRotationOffset;
-        [SerializeField] bool keepChildrenPostWorldShift = false;
+        private GameObject prefab;
+        [SerializeField] private bool keepCountPostfix = true;
+        private bool foldout = false;
+        [SerializeField] private Vector3 localPositionOffset;
+        [SerializeField] private Vector3 localRotationOffset;
+        [SerializeField] private float localScaleMultiplier = 1f;
+        [SerializeField] private bool keepChildrenPostLocalShift = false;
+        [SerializeField] private Vector3 worldPositionOffset;
+        [SerializeField] private Vector3 worldRotationOffset;
+        [SerializeField] private bool keepChildrenPostWorldShift = false;
 
         [MenuItem("Tools/JanSharp/Bulk Replace Window", priority = 500)]
         public static void ShowBulkReplaceWindow()
@@ -35,23 +36,25 @@ namespace JanSharp
         {
             SerializedObject proxy = new SerializedObject(this);
             prefab = (GameObject)EditorGUILayout.ObjectField("New Prefab", prefab, typeof(GameObject), allowSceneObjects: false);
-            EditorGUILayout.Separator();
-            EditorGUILayout.LabelField("The following all get applied in order:");
-            EditorGUILayout.Separator();
             EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepCountPostfix)), new GUIContent("Keep (#) Postfix"));
-            EditorGUILayout.Separator();
-            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(localPositionOffset)));
-            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(localRotationOffset)));
-            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(localScaleMultiplier)));
-            EditorGUILayout.Separator();
-            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepChildrenPostLocalShift)),
-                new GUIContent("Keep Children", GetKeepChildrenTooltip("local")));
-            EditorGUILayout.Separator();
-            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(worldPositionOffset)));
-            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(worldRotationOffset)));
-            EditorGUILayout.Separator();
-            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepChildrenPostWorldShift)),
-                new GUIContent("Keep Children", GetKeepChildrenTooltip("all")));
+            foldout = EditorGUILayout.Foldout(foldout, new GUIContent("Advanced"));
+            if (foldout)
+            {
+                EditorGUILayout.LabelField("The following all get applied in order:");
+                EditorGUILayout.Separator();
+                EditorGUILayout.PropertyField(proxy.FindProperty(nameof(localPositionOffset)));
+                EditorGUILayout.PropertyField(proxy.FindProperty(nameof(localRotationOffset)));
+                EditorGUILayout.PropertyField(proxy.FindProperty(nameof(localScaleMultiplier)));
+                EditorGUILayout.Separator();
+                EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepChildrenPostLocalShift)),
+                    new GUIContent("Keep Children", GetKeepChildrenTooltip("local")));
+                EditorGUILayout.Separator();
+                EditorGUILayout.PropertyField(proxy.FindProperty(nameof(worldPositionOffset)));
+                EditorGUILayout.PropertyField(proxy.FindProperty(nameof(worldRotationOffset)));
+                EditorGUILayout.Separator();
+                EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepChildrenPostWorldShift)),
+                    new GUIContent("Keep Children", GetKeepChildrenTooltip("all")));
+            }
             EditorGUILayout.Separator();
             proxy.ApplyModifiedProperties();
 
