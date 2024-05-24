@@ -1,6 +1,6 @@
 {
   "name": "com.jansharp.editor-tools",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Various editor tools and editor windows.",
   "displayName": "Editor Tools",
   "unity": "2019.4",
@@ -11,6 +11,6 @@
   },
   "license": "MIT",
   "vpmDependencies": {},
-  "url": "https://github.com/JanSharp/VRCEditorTools/releases/download/v1.2.0/com.jansharp.editor-tools.zip",
-  "changelogUrl": "https://github.com/JanSharp/VRCEditorTools/blob/v1.2.0/CHANGELOG.md"
+  "url": "https://github.com/JanSharp/VRCEditorTools/releases/download/v1.2.1/com.jansharp.editor-tools.zip",
+  "changelogUrl": "https://github.com/JanSharp/VRCEditorTools/blob/v1.2.1/CHANGELOG.md"
 }
