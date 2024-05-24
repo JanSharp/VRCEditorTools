@@ -354,7 +354,7 @@ namespace JanSharp
             HashSet<GameObject> toSelect = new HashSet<GameObject>();
             System.Type componentType = typeof(Component);
             foreach (Component component in UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().GetRootGameObjects()
-                .SelectMany(go => go.GetComponentsInChildren<Component>())
+                .SelectMany(go => go.GetComponentsInChildren<Component>(includeInactive: true))
                 .Where(c => c != null && c.GetType().Name == componentName && !toSelect.Contains(c.gameObject)))
             {
                 SerializedObject componentProxy = new SerializedObject(component);

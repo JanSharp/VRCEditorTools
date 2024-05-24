@@ -71,7 +71,7 @@ namespace JanSharp
                     Debug.LogError($"Won't generate LOD Group for {go.name} because it already has one.", go);
                     continue;
                 }
-                Renderer[] renderers = go.GetComponentsInChildren<Renderer>();
+                Renderer[] renderers = go.GetComponentsInChildren<Renderer>(includeInactive: true);
                 if (renderers.Length == 0)
                 {
                     Debug.LogError($"Won't generate LOD Group for {go.name} because it has no renderers.", go);
