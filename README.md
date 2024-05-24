@@ -27,3 +27,4 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
 - Show (Non) Selected Only (plus show/hide all) menu items to quickly show or hide only specific objects in the scene, without affecting their active state (inactive objects cannot be shown like this, naturally/unfortunately)
 - Generate Basic Culling LODs to quickly generate LOD Groups for selected objects simply culling all renderers at 4%
 - Copy/Paste Cull Percentage in the context menu for LOD Groups to quickly modify culling distances for multiple basic culling LOD Groups
+- References Window to see which components and game objects are referenced by other components, as well as seeing what references are crossing the boundry of inside and outside a tree of game objects in either direction
