@@ -7,7 +7,8 @@ namespace JanSharp
     public class BulkReplaceWindow : EditorWindow
     {
         private GameObject prefab;
-        [SerializeField] private bool keepCountPostfix = true;
+        [SerializeField] private bool keepOriginalCountPostfix = true;
+        [SerializeField] private bool keepOriginalName = false;
         private bool foldout = false;
         [SerializeField] private Vector3 localPositionOffset;
         [SerializeField] private Vector3 localRotationOffset;
@@ -36,7 +37,10 @@ namespace JanSharp
         {
             SerializedObject proxy = new SerializedObject(this);
             prefab = (GameObject)EditorGUILayout.ObjectField("New Prefab", prefab, typeof(GameObject), allowSceneObjects: false);
-            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepCountPostfix)), new GUIContent("Keep (#) Postfix"));
+            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepOriginalCountPostfix)),
+                new GUIContent("Keep Original (#) Postfix", "When true then the last (#) in the name of replaced objects will remain untouched."));
+            EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepOriginalName)),
+                new GUIContent("Keep Original Name", "When true then the name - so the part before the (#) - of the replaced objects will remain untouched."));
             foldout = EditorGUILayout.Foldout(foldout, new GUIContent("Advanced"));
             if (foldout)
             {
@@ -82,8 +86,7 @@ namespace JanSharp
                     continue;
                 Undo.RegisterCreatedObjectUndo(to, $"replace object with '{prefab.name}'");
                 to.transform.SetSiblingIndex(from.transform.GetSiblingIndex());
-                if (keepCountPostfix)
-                    CopyCountPostfix(from, to);
+                ChangeName(from, to);
                 to.transform.localPosition = from.transform.localPosition + localPositionOffset;
                 to.transform.localRotation = from.transform.localRotation * actualLocalRotationOffset;
                 to.transform.localScale = from.transform.localScale * localScaleMultiplier;
@@ -102,13 +105,22 @@ namespace JanSharp
         }
 
         private static Regex countPostfixRegex = new Regex(@" \(\d+\)$", RegexOptions.RightToLeft | RegexOptions.Compiled);
-        private void CopyCountPostfix(GameObject from, GameObject to)
+        private void ChangeName(GameObject from, GameObject to)
         {
-            Match fromMatch = countPostfixRegex.Match(from.name);
-            if (!fromMatch.Success)
+            if (!keepOriginalName && !keepOriginalCountPostfix)
                 return;
-            // Strip an existing count postfix if it exists.
-            to.name = countPostfixRegex.Replace(to.name, "") + fromMatch.Value;
+            string name = from.name;
+            string fromPostfix = "";
+            Match fromMatch = countPostfixRegex.Match(from.name);
+            if (fromMatch.Success)
+            {
+                fromPostfix = fromMatch.Value;
+                name = name.Substring(0, name.Length - fromPostfix.Length);
+            }
+            if (!keepOriginalName)
+                // Strip an existing count postfix if it exists.
+                name = keepOriginalCountPostfix ? countPostfixRegex.Replace(to.name, "") : to.name;
+            to.name = keepOriginalCountPostfix ? name + fromPostfix : name;
         }
 
         private void TryKeepAddedChildren(GameObject from, GameObject to)
