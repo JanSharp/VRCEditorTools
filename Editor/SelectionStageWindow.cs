@@ -89,10 +89,10 @@ namespace JanSharp
             root.Add(listBox);
 
             Box buttonsBox = new Box();
-            IMGUIContainer buttonColumns = new IMGUIContainer() { style = { flexDirection = FlexDirection.Row } };
+            VisualElement buttonColumns = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
 
             {
-                IMGUIContainer column = new IMGUIContainer() { style = { flexGrow = 1f } };
+                VisualElement column = new VisualElement() { style = { flexGrow = 1f } };
                 column.Add(new Label("Affect Stage")
                 {
                     style = { alignSelf = Align.Center },
@@ -108,7 +108,7 @@ namespace JanSharp
             }
 
             {
-                IMGUIContainer column = new IMGUIContainer() { style = { flexGrow = 1f } };
+                VisualElement column = new VisualElement() { style = { flexGrow = 1f } };
                 column.Add(new Label("Affect Selection")
                 {
                     style = { alignSelf = Align.Center },
@@ -125,7 +125,7 @@ namespace JanSharp
             }
 
             {
-                IMGUIContainer column = new IMGUIContainer() { style = { flexGrow = 1f } };
+                VisualElement column = new VisualElement() { style = { flexGrow = 1f } };
                 column.Add(new Label("Within Stage") { style = { alignSelf = Align.Center } });
                 column.Add(new Button(DeselectWithinStage) { text = "Deselect" });
                 column.Add(new Button(SortWithinStage) { text = "Sort" });
