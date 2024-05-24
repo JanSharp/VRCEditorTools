@@ -10,3 +10,6 @@
 - [ ] everything that I'm doing that iterates all objects does not work inside of prefab preview scenes or whatever they're called
 - [ ] add support in selection stage for non game object objects
 - [ ] tool to generate game objects for each mesh group in an obj file
+- [ ] tool to find instances with missing prefabs
+- [ ] tool to find (and remove) missing scripts
+- [ ] create parent creates a transform when it should create a rect transform
