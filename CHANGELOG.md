@@ -1,6 +1,23 @@
 
 # Changelog
 
+## [1.2.0] - 2024-05-24
+
+### Changed
+
+- Readd check for immutable prefabs in Create Parent ([`9ef7813`](https://github.com/JanSharp/VRCEditorTools/commit/9ef781361bbb71659b5bdf67695c1edd7a25c35c))
+- Update count in Bulk Replace on selection change ([`4d619cc`](https://github.com/JanSharp/VRCEditorTools/commit/4d619ccb76e5fb233793fac8dac2b516ceea32d0))
+- Add foldout to bulk replace window to hide bloat ([`a71cdd1`](https://github.com/JanSharp/VRCEditorTools/commit/a71cdd1521febe0b65cf0b9170c779bda9782da4))
+
+### Added
+
+- Add References Window to find incoming references ([`c264594`](https://github.com/JanSharp/VRCEditorTools/commit/c26459486823d54fe5122bfc5eadaee9d905c056))
+- Add Keep Original Name checkbox to Bulk Replace ([`44bebb7`](https://github.com/JanSharp/VRCEditorTools/commit/44bebb73c9c3dc941bc273029f03b9c01325408f))
+
+### Fixed
+
+- **Breaking:** Fix inactive children getting ignored in PropertySearchWindow, BulkLODGroups and SelectParticleSystems ([`9634ef8`](https://github.com/JanSharp/VRCEditorTools/commit/9634ef8ddc0a92e1c73336af343f64cd0141f7a7))
+
 ## [1.1.2] - 2024-05-22
 
 ### Changed
@@ -79,6 +96,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.2.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.2.0
 [1.1.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.2
 [1.1.1]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.1
 [1.1.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.0
