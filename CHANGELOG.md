@@ -1,6 +1,22 @@
 
 # Changelog
 
+## [1.3.0] - 2024-07-12
+
+_Make sure to close the Occlusion Visibility Window before updating, otherwise Unity may throw a fit._
+
+### Added
+
+- Add Static Flags Helper Window to help with all flags, not just occlusion and batching ([`962660a`](https://github.com/JanSharp/VRCEditorTools/commit/962660a4ff2fe81de95814e36cfc9f6a90424394))
+
+### Removed
+
+- **Breaking:** Remove Occlusion Visibility Window ([`962660a`](https://github.com/JanSharp/VRCEditorTools/commit/962660a4ff2fe81de95814e36cfc9f6a90424394))
+
+### Fixed
+
+- Remove Runtime.meta file from vpm packages ([`c1e3466`](https://github.com/JanSharp/VRCEditorTools/commit/c1e3466cb3c31b4a3992363d47e61f425245d03a))
+
 ## [1.2.0] - 2024-05-24
 
 ### Changed
@@ -96,6 +112,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.0
 [1.2.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.2.0
 [1.1.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.2
 [1.1.1]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.1
