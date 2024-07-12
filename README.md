@@ -15,7 +15,7 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
   - Uses the `Normal Color` of the selected UI components, like buttons, to update all the other colors like highlighted, pressed and so on
   - All currently selected GameObjects in the hierarchy are affected, if they have a Selectable UI component
   - Yes, Selectable is a base class derived by several other components
-- OcclusionVisibilityWindow to help visualize which objects are occluders and occludees (and static batchers)
+- Static Flags Helper Window to help visualize and modify any or all static flags of objects in the scene. [Static Flags Docs](https://docs.unity3d.com/2022.3/Documentation/Manual/StaticObjects.html)
 - BulkReplaceWindow to quickly replace many objects with another prefab
 - Select Particle Systems based on their culling mode
 - Save Cached Unity Asset Changes is a tiny editor script to write any asset file changes unity has cached in memory to the drive
