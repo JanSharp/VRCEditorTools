@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.3.1] - 2024-07-27
+
+### Fixed
+
+- Fix static flags helper window ignoring inactive children ([`6682280`](https://github.com/JanSharp/VRCEditorTools/commit/66822805b7c58b12e2cc4e1f4af656f1f03078fb))
+
 ## [1.3.0] - 2024-07-12
 
 _Make sure to close the Occlusion Visibility Window before updating, otherwise Unity may throw a fit._
@@ -112,6 +118,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.1]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.1
 [1.3.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.0
 [1.2.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.2.0
 [1.1.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.1.2
