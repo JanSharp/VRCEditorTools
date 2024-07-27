@@ -197,7 +197,9 @@ namespace JanSharp
         private IEnumerable<GameObject> GetSelectedAndChildren()
         {
             // Lazy Linq user alert.
-            return Selection.gameObjects.SelectMany(go => go.transform.GetComponentsInChildren<Transform>().Select(t => t.gameObject));
+            return Selection.gameObjects
+                .SelectMany(go => go.transform.GetComponentsInChildren<Transform>(includeInactive: true)
+                .Select(t => t.gameObject));
         }
 
         private void Apply() => ApplyInternal(Selection.gameObjects);
