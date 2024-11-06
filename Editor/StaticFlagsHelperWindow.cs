@@ -16,7 +16,7 @@ namespace JanSharp
             new PerFlagData(StaticEditorFlags.OccluderStatic, "Occluder Static"),
             new PerFlagData(StaticEditorFlags.OccludeeStatic, "Occludee Static"),
             new PerFlagData(StaticEditorFlags.BatchingStatic, "Batching Static"),
-            new PerFlagData(StaticEditorFlags.NavigationStatic, "Navigation Static"),
+            new PerFlagData(StaticEditorFlags.NavigationStatic, "Navigation Static"), // TODO: What's this about NavMeshBuilder.CollectSources instead of setting flags on objects? Investigate.
             new PerFlagData(StaticEditorFlags.OffMeshLinkGeneration, "Off Mesh Link Generation"),
             new PerFlagData(StaticEditorFlags.ReflectionProbeStatic, "Reflection Probe Static"),
         };
