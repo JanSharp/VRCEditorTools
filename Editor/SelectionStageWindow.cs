@@ -63,28 +63,27 @@ namespace JanSharp
                 style = { flexGrow = 1f },
                 selectionType = SelectionType.Multiple,
             };
-            // TODO: update this to unity 2022
-            // listView.onItemChosen += obj => {
-            //     if (obj == null)
-            //         return;
-            //     GameObject go = (GameObject)obj;
-            //     EditorGUIUtility.PingObject(go); // Jump to in hierarchy, without selecting.
-            //     var prev = Selection.objects;
-            //     Selection.activeObject = go;
-            //     SceneView.FrameLastActiveSceneView();
-            //     Selection.objects = prev;
-            //     if (listViewSelected.Count == 1 && ((GameObject)listViewSelected[0]) == go)
-            //     {
-            //         // When double clicking a single element, clear the selection again as to prevent
-            //         // accidentally narrowing the stage through having only 1 element selected.
-            //         listView.selectedIndex = -1;
-            //         RefreshList();
-            //     }
-            // };
-            // listView.onSelectionChanged += selected => {
-            //     listViewSelected = selected;
-            //     countLabel.text = GetCountLabelText();
-            // };
+            listView.itemsChosen += obj => {
+                GameObject go = (GameObject)obj.FirstOrDefault();
+                if (go == null)
+                    return;
+                EditorGUIUtility.PingObject(go); // Jump to in hierarchy, without selecting.
+                var prev = Selection.objects;
+                Selection.activeObject = go;
+                SceneView.FrameLastActiveSceneView();
+                Selection.objects = prev;
+                if (listViewSelected.Count == 1 && ((GameObject)listViewSelected[0]) == go)
+                {
+                    // When double clicking a single element, clear the selection again as to prevent
+                    // accidentally narrowing the stage through having only 1 element selected.
+                    listView.selectedIndex = -1;
+                    RefreshList();
+                }
+            };
+            listView.selectionChanged += selected => {
+                listViewSelected = selected.ToList();
+                countLabel.text = GetCountLabelText();
+            };
             listBox.Add(listView);
 
             root.Add(listBox);
