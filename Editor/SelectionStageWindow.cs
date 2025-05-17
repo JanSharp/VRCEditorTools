@@ -88,7 +88,7 @@ namespace JanSharp
 
             root.Add(listBox);
 
-            Box buttonsBox = new Box();
+            Box buttonsBox = new Box()  { style = { flexShrink = 0f } };
             VisualElement buttonColumns = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
 
             {
