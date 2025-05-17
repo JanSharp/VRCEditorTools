@@ -16,25 +16,25 @@ namespace JanSharp
         // support, without having to regenerate the lut every time it is used, as well as only refreshing the
         // UI when an undo/redo actually modified the stage.
         [SerializeField] private ulong currentUniqueStateId = 0uL;
-        [SerializeField] private List<GameObject> staged = new List<GameObject>();
+        [SerializeField] private List<Object> staged = new List<Object>();
         private ulong nextUniqueStateId = 1uL;
         private ulong lastRefreshedUniqueStateId = 0uL;
         private ulong stagedLutAssociatedUniqueStateId = 0uL;
-        private HashSet<GameObject> stagedLut = new HashSet<GameObject>();
-        private HashSet<GameObject> StagedLut
+        private HashSet<Object> stagedLut = new HashSet<Object>();
+        private HashSet<Object> StagedLut
         {
             get
             {
                 if (stagedLutAssociatedUniqueStateId == currentUniqueStateId)
                     return stagedLut;
-                stagedLut = new HashSet<GameObject>(staged);
+                stagedLut = new HashSet<Object>(staged);
                 return stagedLut;
             }
         }
         private ListView listView;
         private List<object> listViewSelected = new List<object>();
-        private IEnumerable<GameObject> SelectedInStage => listViewSelected.Any(obj => obj != null)
-            ? listViewSelected.Where(obj => obj != null).Cast<GameObject>()
+        private IEnumerable<Object> SelectedInStage => listViewSelected.Any(obj => obj != null)
+            ? listViewSelected.Where(obj => obj != null).Cast<Object>()
             : staged;
         private Label countLabel;
 
@@ -53,10 +53,18 @@ namespace JanSharp
 
             Box listBox = new Box() { style = { flexGrow = 1f } };
 
-            System.Func<VisualElement> makeItem = () => new Label();
+            System.Func<VisualElement> makeItem = () =>
+            {
+                VisualElement row = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
+                row.Add(new Image() { style = { width = 18f, flexShrink = 0f } });
+                row.Add(new Label());
+                return row;
+            };
             System.Action<VisualElement, int> bindItem = (element, index) =>
             {
-                Label label = (Label)element;
+                Image image = (Image)element[0];
+                image.image = AssetPreview.GetMiniThumbnail(staged[index]);
+                Label label = (Label)element[1];
                 label.text = staged[index].name;
             };
             listView = new ListView(staged, 16, makeItem, bindItem)
@@ -66,15 +74,15 @@ namespace JanSharp
             };
             listView.itemsChosen += obj =>
             {
-                GameObject go = (GameObject)obj.FirstOrDefault();
+                Object go = (Object)obj.FirstOrDefault();
                 if (go == null)
                     return;
                 EditorGUIUtility.PingObject(go); // Jump to in hierarchy, without selecting.
                 var prev = Selection.objects;
                 Selection.activeObject = go;
-                SceneView.FrameLastActiveSceneView();
+                SceneView.FrameLastActiveSceneView(); // Does nothing if the selected object is not in the hierarchy.
                 Selection.objects = prev;
-                if (listViewSelected.Count == 1 && ((GameObject)listViewSelected[0]) == go)
+                if (listViewSelected.Count == 1 && ((Object)listViewSelected[0]) == go)
                 {
                     // When double clicking a single element, clear the selection again as to prevent
                     // accidentally narrowing the stage through having only 1 element selected.
@@ -202,7 +210,7 @@ namespace JanSharp
             stagedLutAssociatedUniqueStateId = currentUniqueStateId;
         }
 
-        private void RemoveObjectsFromStage(IEnumerable<GameObject> toRemove, bool inverted = false)
+        private void RemoveObjectsFromStage(IEnumerable<Object> toRemove, bool inverted = false)
         {
             if (!inverted && !toRemove.Any())
                 return;
@@ -211,7 +219,7 @@ namespace JanSharp
             int newI = 0;
             for (int i = 0; i < c; i++)
             {
-                GameObject go = staged[i];
+                Object go = staged[i];
                 if (toRemove.Contains(go) != inverted)
                     StagedLut.Remove(go);
                 else
@@ -224,12 +232,12 @@ namespace JanSharp
             RefreshList();
         }
 
-        private void OverwriteStageEntirely(ICollection<GameObject> newSelection)
+        private void OverwriteStageEntirely(ICollection<Object> newSelection)
         {
             BeginUndoAbleOperation("Set Selection State");
             staged.Clear();
             staged.AddRange(newSelection);
-            stagedLut = new HashSet<GameObject>(staged);
+            stagedLut = new HashSet<Object>(staged);
             EndUndoAbleOperation();
             MarkStagedLutAsUpToDate();
             listView.selectedIndex = -1;
@@ -245,7 +253,7 @@ namespace JanSharp
         private void AddToStage()
         {
             BeginUndoAbleOperation("Add to Selection Stage");
-            foreach (GameObject go in Selection.gameObjects)
+            foreach (Object go in Selection.objects)
             {
                 if (StagedLut.Contains(go))
                     continue;
@@ -259,22 +267,22 @@ namespace JanSharp
 
         private void ExcludeFromStage()
         {
-            RemoveObjectsFromStage(Selection.gameObjects);
+            RemoveObjectsFromStage(Selection.objects);
         }
 
         private void FlipExcludeFromStage()
         {
-            OverwriteStageEntirely(Selection.gameObjects.Except(SelectedInStage).ToList());
+            OverwriteStageEntirely(Selection.objects.Except(SelectedInStage).ToList());
         }
 
         private void IntersectWithStage()
         {
-            RemoveObjectsFromStage(Selection.gameObjects, inverted: true);
+            RemoveObjectsFromStage(Selection.objects, inverted: true);
         }
 
         private void SymmetricDifferenceWithStage()
         {
-            GameObject[] selected = Selection.gameObjects;
+            Object[] selected = Selection.objects;
             OverwriteStageEntirely(SelectedInStage
                 .Union(selected)
                 .Except(SelectedInStage.Intersect(selected))
@@ -283,33 +291,33 @@ namespace JanSharp
 
         private void OverwriteStage()
         {
-            OverwriteStageEntirely(Selection.gameObjects);
+            OverwriteStageEntirely(Selection.objects);
         }
 
 
         private void AddToSelection()
         {
-            Selection.objects = Selection.gameObjects.Union(SelectedInStage).ToArray();
+            Selection.objects = Selection.objects.Union(SelectedInStage).ToArray();
         }
 
         private void ExcludeFromSelection()
         {
-            Selection.objects = Selection.gameObjects.Except(SelectedInStage).ToArray();
+            Selection.objects = Selection.objects.Except(SelectedInStage).ToArray();
         }
 
         private void FlipExcludeFromSelection()
         {
-            Selection.objects = SelectedInStage.Except(Selection.gameObjects).ToArray();
+            Selection.objects = SelectedInStage.Except(Selection.objects).ToArray();
         }
 
         private void IntersectWithSelection()
         {
-            Selection.objects = Selection.gameObjects.Intersect(SelectedInStage).ToArray();
+            Selection.objects = Selection.objects.Intersect(SelectedInStage).ToArray();
         }
 
         private void SymmetricDifferenceWithSelection()
         {
-            GameObject[] selected = Selection.gameObjects;
+            Object[] selected = Selection.objects;
             Selection.objects = selected
                 .Union(SelectedInStage)
                 .Except(selected.Intersect(SelectedInStage))
@@ -327,9 +335,9 @@ namespace JanSharp
             listView.selectedIndex = -1;
         }
 
-        private class GameObjectComparer : Comparer<GameObject>
+        private class ObjectComparer : Comparer<Object>
         {
-            public override int Compare(GameObject x, GameObject y)
+            public override int Compare(Object x, Object y)
             {
                 return x.name.ToLower().CompareTo(y.name.ToLower());
             }
@@ -339,7 +347,7 @@ namespace JanSharp
         {
             Cleanup();
             BeginUndoAbleOperation("Sort Selection Stage");
-            staged.Sort(new GameObjectComparer());
+            staged.Sort(new ObjectComparer());
             EndUndoAbleOperation();
             MarkStagedLutAsUpToDate();
             listView.selectedIndex = -1;
@@ -349,7 +357,7 @@ namespace JanSharp
         private void RemoveWithinStage()
         {
             // Not using SelectedInStage since this should not clear the stage when nothing is selected.
-            RemoveObjectsFromStage(listViewSelected.Where(obj => obj != null).Cast<GameObject>());
+            RemoveObjectsFromStage(listViewSelected.Where(obj => obj != null).Cast<Object>());
         }
 
         private void ClearStage()
@@ -364,7 +372,7 @@ namespace JanSharp
         }
 
 
-        public void SetStage(ICollection<GameObject> newStage)
+        public void SetStage(ICollection<Object> newStage)
         {
             OverwriteStageEntirely(newStage);
         }

@@ -336,7 +336,7 @@ namespace JanSharp
 
         private void SearchIntoSelectionStage()
         {
-            ICollection<GameObject> results = Search();
+            ICollection<Object> results = Search().Cast<Object>().ToArray();
             if (results.Count == 0)
                 return;
             if (selectionStage == null)
