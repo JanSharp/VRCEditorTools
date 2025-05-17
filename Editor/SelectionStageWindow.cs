@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// TODO: Once upgrading to 2022 add more and better selection support within the stage.
 // TODO: dedup - remove objects part of the same prefab
 
 namespace JanSharp
@@ -106,7 +105,7 @@ namespace JanSharp
                 {
                     // When double clicking a single element, clear the selection again as to prevent
                     // accidentally narrowing the stage through having only 1 element selected.
-                    listView.selectedIndex = -1;
+                    listView.ClearSelection();
                     RefreshList();
                 }
             };
@@ -282,11 +281,29 @@ namespace JanSharp
             stagedLutAssociatedUniqueStateId = currentUniqueStateId;
         }
 
+        private HashSet<Object> RememberStageSelection()
+        {
+            HashSet<Object> selectedObjects = listView.selectedIndices.Select(i => staged[i]).ToHashSet();
+            listView.ClearSelection();
+            return selectedObjects;
+        }
+
+        private void RestoreStageSelection(HashSet<Object> selectedObjects)
+        {
+            for (int i = 0; i < staged.Count; i++)
+            {
+                Object obj = staged[i];
+                if (selectedObjects.Contains(obj))
+                    listView.AddToSelection(i);
+            }
+        }
+
         private void RemoveObjectsFromStage(IEnumerable<Object> toRemove, bool inverted = false)
         {
             if (!inverted && !toRemove.Any())
                 return;
             BeginUndoAbleOperation("Removed from Selection Stage");
+            HashSet<Object> selectedObjects = RememberStageSelection();
             int c = staged.Count;
             int newI = 0;
             for (int i = 0; i < c; i++)
@@ -300,7 +317,7 @@ namespace JanSharp
             staged.RemoveRange(newI, c - newI);
             EndUndoAbleOperation();
             MarkStagedLutAsUpToDate();
-            listView.selectedIndex = -1;
+            RestoreStageSelection(selectedObjects);
             RefreshList();
         }
 
@@ -312,7 +329,7 @@ namespace JanSharp
             stagedLut = new HashSet<Object>(staged);
             EndUndoAbleOperation();
             MarkStagedLutAsUpToDate();
-            listView.selectedIndex = -1;
+            listView.ClearSelection();
             RefreshList();
         }
 
@@ -404,7 +421,7 @@ namespace JanSharp
 
         private void DeselectWithinStage()
         {
-            listView.selectedIndex = -1;
+            listView.ClearSelection();
         }
 
         private class ObjectComparer : Comparer<Object>
@@ -419,10 +436,11 @@ namespace JanSharp
         {
             Cleanup();
             BeginUndoAbleOperation("Sort Selection Stage");
+            HashSet<Object> selectedObjects = RememberStageSelection();
             staged.Sort(new ObjectComparer());
             EndUndoAbleOperation();
             MarkStagedLutAsUpToDate();
-            listView.selectedIndex = -1;
+            RestoreStageSelection(selectedObjects);
             RefreshList();
         }
 
@@ -439,7 +457,7 @@ namespace JanSharp
             stagedLut.Clear();
             EndUndoAbleOperation();
             MarkStagedLutAsUpToDate();
-            listView.selectedIndex = -1;
+            listView.ClearSelection();
             RefreshList();
         }
 
