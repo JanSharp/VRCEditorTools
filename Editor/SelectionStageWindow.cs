@@ -1,8 +1,9 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.UIElements;
 using System.Linq;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 // TODO: Once upgrading to 2022 add more and better selection support within the stage.
 // TODO: dedup - remove objects part of the same prefab
@@ -46,6 +47,22 @@ namespace JanSharp
             window.Show();
         }
 
+        private static string GetHierarchyPath(Transform t, string prefix, string separator)
+        {
+            StringBuilder sb = new StringBuilder(prefix);
+            void Add(Transform parent)
+            {
+                if (parent == null)
+                    return;
+                Add(parent.parent);
+                sb.Append(parent.name);
+                if (parent != t)
+                    sb.Append(separator);
+            }
+            Add(t);
+            return sb.ToString();
+        }
+
         private void CreateGUI()
         {
             VisualElement root = rootVisualElement;
@@ -61,10 +78,14 @@ namespace JanSharp
             };
             System.Action<VisualElement, int> bindItem = (element, index) =>
             {
+                Object obj = staged[index];
+                element.tooltip = obj is GameObject && !AssetDatabase.IsMainAsset(obj)
+                    ? GetHierarchyPath((obj as GameObject).transform, "Hierarchy:\n  ", "\n  ")
+                    : "Asset:\n  " + AssetDatabase.GetAssetPath(obj).Replace("/", "\n  ");
                 Image image = (Image)element[0];
-                image.image = AssetPreview.GetMiniThumbnail(staged[index]);
                 Label label = (Label)element[1];
-                label.text = staged[index].name;
+                image.image = AssetPreview.GetMiniThumbnail(obj);
+                label.text = obj.name;
             };
             listView = new ListView(staged, 16, makeItem, bindItem)
             {
