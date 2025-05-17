@@ -15,3 +15,4 @@
 - [x] fix selection stage flex layout pushing the bottom frame and all the buttons off the window when there's lots of elemepts in the list above
 - [ ] Editor window to show all objects marked as editor only as well as putting them in a list
 - [ ] select on double click or enter toggle
+- [ ] apparently I once had this idea for the Selection Stage, I don't actually think it's a good idea: dedup - remove objects part of the same prefab

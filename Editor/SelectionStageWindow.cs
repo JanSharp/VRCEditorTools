@@ -5,8 +5,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// TODO: dedup - remove objects part of the same prefab
-
 namespace JanSharp
 {
     public class SelectionStageWindow : EditorWindow
