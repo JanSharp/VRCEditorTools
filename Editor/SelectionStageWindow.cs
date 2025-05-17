@@ -232,7 +232,8 @@ namespace JanSharp
 
         private void OnHierarchyChange()
         {
-            Cleanup();
+            if (!Cleanup())
+                RefreshListWithoutUndo();
         }
 
         private void OnUndoRedo()
@@ -251,6 +252,11 @@ namespace JanSharp
         private void RefreshList()
         {
             lastRefreshedUniqueStateId = currentUniqueStateId;
+            RefreshListWithoutUndo();
+        }
+
+        private void RefreshListWithoutUndo()
+        {
             listView.Rebuild();
             countLabel.text = GetCountLabelText();
         }
@@ -296,10 +302,11 @@ namespace JanSharp
             }
         }
 
-        private void RemoveObjectsFromStage(IEnumerable<Object> toRemove, bool inverted = false)
+        /// <returns><see langword="false"/> if nothing happened.</returns>
+        private bool RemoveObjectsFromStage(IEnumerable<Object> toRemove, bool inverted = false)
         {
             if (!inverted && !toRemove.Any())
-                return;
+                return false;
             BeginUndoAbleOperation("Removed from Selection Stage");
             HashSet<Object> selectedObjects = RememberStageSelection();
             int c = staged.Count;
@@ -317,6 +324,7 @@ namespace JanSharp
             MarkStagedLutAsUpToDate();
             RestoreStageSelection(selectedObjects);
             RefreshList();
+            return true;
         }
 
         private void OverwriteStageEntirely(ICollection<Object> newSelection)
@@ -331,9 +339,10 @@ namespace JanSharp
             RefreshList();
         }
 
-        private void Cleanup()
+        /// <returns><see langword="false"/> if nothing happened.</returns>
+        private bool Cleanup()
         {
-            RemoveObjectsFromStage(staged.Where(go => go == null));
+            return RemoveObjectsFromStage(staged.Where(go => go == null));
         }
 
 
