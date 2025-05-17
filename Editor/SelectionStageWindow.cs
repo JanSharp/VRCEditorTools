@@ -54,7 +54,8 @@ namespace JanSharp
             Box listBox = new Box() { style = { flexGrow = 1f } };
 
             System.Func<VisualElement> makeItem = () => new Label();
-            System.Action<VisualElement, int> bindItem = (element, index) => {
+            System.Action<VisualElement, int> bindItem = (element, index) =>
+            {
                 Label label = (Label)element;
                 label.text = staged[index].name;
             };
@@ -63,7 +64,8 @@ namespace JanSharp
                 style = { flexGrow = 1f },
                 selectionType = SelectionType.Multiple,
             };
-            listView.itemsChosen += obj => {
+            listView.itemsChosen += obj =>
+            {
                 GameObject go = (GameObject)obj.FirstOrDefault();
                 if (go == null)
                     return;
@@ -80,7 +82,8 @@ namespace JanSharp
                     RefreshList();
                 }
             };
-            listView.selectionChanged += selected => {
+            listView.selectionChanged += selected =>
+            {
                 listViewSelected = selected.ToList();
                 countLabel.text = GetCountLabelText();
             };
@@ -88,7 +91,7 @@ namespace JanSharp
 
             root.Add(listBox);
 
-            Box buttonsBox = new Box()  { style = { flexShrink = 0f } };
+            Box buttonsBox = new Box() { style = { flexShrink = 0f } };
             VisualElement buttonColumns = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
 
             {
