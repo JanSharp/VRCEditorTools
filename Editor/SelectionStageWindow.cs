@@ -234,7 +234,7 @@ namespace JanSharp
 
         private void OverwriteStageEntirely(ICollection<Object> newSelection)
         {
-            BeginUndoAbleOperation("Set Selection State");
+            BeginUndoAbleOperation("Set Selection Stage");
             staged.Clear();
             staged.AddRange(newSelection);
             stagedLut = new HashSet<Object>(staged);
