@@ -12,3 +12,5 @@
 - [ ] tool to find instances with missing prefabs
 - [ ] tool to find (and remove) missing scripts
 - [ ] create parent creates a transform when it should create a rect transform
+- [ ] fix selection stage flex layout pushing the bottom frame and all the buttons off the window when there's lots of elemepts in the list above
+- [ ] Editor window to show all objects marked as editor only as well as putting them in a list
