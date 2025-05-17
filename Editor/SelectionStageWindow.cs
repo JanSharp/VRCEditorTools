@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using System.Linq;
 
-// TODO: Figure out how tooltips work.
 // TODO: Once upgrading to 2022 add more and better selection support within the stage.
 // TODO: dedup - remove objects part of the same prefab
 
@@ -109,12 +108,38 @@ namespace JanSharp
                     style = { alignSelf = Align.Center },
                     tooltip = "How should the current selection affect the stage?",
                 });
-                column.Add(new Button(AddToStage) { text = "Add" });
-                column.Add(new Button(ExcludeFromStage) { text = "Exclude" });
-                column.Add(new Button(FlipExcludeFromStage) { text = "Flip Exclude" });
-                column.Add(new Button(IntersectWithStage) { text = "Intersect" });
-                column.Add(new Button(SymmetricDifferenceWithStage) { text = "Symmetric Diff" });
-                column.Add(new Button(OverwriteStage) { text = "Overwrite" });
+                column.Add(new Button(AddToStage)
+                {
+                    text = "Add",
+                    tooltip = "Add selected objects to the stage",
+                });
+                column.Add(new Button(ExcludeFromStage)
+                {
+                    text = "Exclude",
+                    tooltip = "Remove selected objects from the stage",
+                });
+                column.Add(new Button(FlipExcludeFromStage)
+                {
+                    text = "Flip Exclude",
+                    tooltip = "Add selected objects to the stage, "
+                        + "then remove objects that were already in the stage previously",
+                });
+                column.Add(new Button(IntersectWithStage)
+                {
+                    text = "Intersect",
+                    tooltip = "Remove not selected objects from the stage",
+                });
+                column.Add(new Button(SymmetricDifferenceWithStage)
+                {
+                    text = "Symmetric Diff",
+                    tooltip = "The inverse of Intersect. Add selected objects to the stage, "
+                        + "then remove objects that were both staged and selected previously",
+                });
+                column.Add(new Button(OverwriteStage)
+                {
+                    text = "Overwrite",
+                    tooltip = "Set stage equal to the current selection",
+                });
                 buttonColumns.Add(column);
             }
 
@@ -126,20 +151,46 @@ namespace JanSharp
                     tooltip = "How should the current stage affect the Selection?\n"
                         + "When nothing is selected within the stage, the entire stage is considered.",
                 });
-                column.Add(new Button(AddToSelection) { text = "Add", });
-                column.Add(new Button(ExcludeFromSelection) { text = "Exclude" });
-                column.Add(new Button(FlipExcludeFromSelection) { text = "Flip Exclude" });
-                column.Add(new Button(IntersectWithSelection) { text = "Intersect" });
-                column.Add(new Button(SymmetricDifferenceWithSelection) { text = "Symmetric Diff" });
-                column.Add(new Button(OverwriteSelection) { text = "Overwrite" });
+                column.Add(new Button(AddToSelection)
+                {
+                    text = "Add",
+                    tooltip = "Add staged objects to selection",
+                });
+                column.Add(new Button(ExcludeFromSelection)
+                {
+                    text = "Exclude",
+                    tooltip = "Remove staged objects from selection",
+                });
+                column.Add(new Button(FlipExcludeFromSelection)
+                {
+                    text = "Flip Exclude",
+                    tooltip = "Add staged objects to the selection, "
+                        + "then deselect objects that were already selected previously",
+                });
+                column.Add(new Button(IntersectWithSelection)
+                {
+                    text = "Intersect",
+                    tooltip = "Remove non staged objects from selection",
+                });
+                column.Add(new Button(SymmetricDifferenceWithSelection)
+                {
+                    text = "Symmetric Diff",
+                    tooltip = "The inverse of Intersect. Add staged objects to selection, "
+                        + "then deselect objects that were both staged and selected previously",
+                });
+                column.Add(new Button(OverwriteSelection)
+                {
+                    text = "Overwrite",
+                    tooltip = "Set selection equal to the stage",
+                });
                 buttonColumns.Add(column);
             }
 
             {
                 VisualElement column = new VisualElement() { style = { flexGrow = 1f } };
-                column.Add(new Label("Within Stage") { style = { alignSelf = Align.Center } });
+                column.Add(new Label("Within Stage") { style = { alignSelf = Align.Center }, });
                 column.Add(new Button(DeselectWithinStage) { text = "Deselect" });
-                column.Add(new Button(SortWithinStage) { text = "Sort" });
+                column.Add(new Button(SortWithinStage) { text = "Sort", tooltip = "Sorts alphabetically, case insensitive" });
                 column.Add(new Button(RemoveWithinStage) { text = "Remove" });
                 column.Add(new Button(ClearStage) { text = "Clear" });
                 countLabel = new Label(GetCountLabelText())
