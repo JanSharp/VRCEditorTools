@@ -110,7 +110,7 @@ namespace JanSharp
                     // When double clicking a single element, clear the selection again as to prevent
                     // accidentally narrowing the stage through having only 1 element selected.
                     listView.ClearSelection();
-                    RefreshList();
+                    RefreshListWithoutUndo();
                 }
             };
             listView.selectionChanged += selected =>
