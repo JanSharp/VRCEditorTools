@@ -71,14 +71,14 @@ namespace JanSharp
 
             Box listBox = new Box() { style = { flexGrow = 1f } };
 
-            System.Func<VisualElement> makeItem = () =>
+            VisualElement MakeItem()
             {
                 VisualElement row = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
                 row.Add(new Image() { style = { width = 18f, flexShrink = 0f } });
                 row.Add(new Label());
                 return row;
-            };
-            System.Action<VisualElement, int> bindItem = (element, index) =>
+            }
+            void BindItem(VisualElement element, int index)
             {
                 Object obj = staged[index];
                 string tooltip = IsAsset(obj)
@@ -89,8 +89,8 @@ namespace JanSharp
                 image.image = AssetPreview.GetMiniThumbnail(obj);
                 image.tooltip = tooltip; // Having the tooltip on the entire row is frankly annoying.
                 label.text = obj.name;
-            };
-            listView = new ListView(staged, 16, makeItem, bindItem)
+            }
+            listView = new ListView(staged, 16, MakeItem, BindItem)
             {
                 style = { flexGrow = 1f },
                 selectionType = SelectionType.Multiple,
