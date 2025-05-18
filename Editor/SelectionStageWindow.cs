@@ -132,6 +132,11 @@ namespace JanSharp
                     style = { alignSelf = Align.Center },
                     tooltip = "How should the current selection affect the stage?",
                 });
+                column.Add(new Button(OverwriteStage)
+                {
+                    text = "Overwrite",
+                    tooltip = "Set stage equal to the current selection",
+                });
                 column.Add(new Button(AddToStage)
                 {
                     text = "Add",
@@ -159,11 +164,6 @@ namespace JanSharp
                     tooltip = "The inverse of Intersect. Add selected objects to the stage, "
                         + "then remove objects that were both staged and selected previously",
                 });
-                column.Add(new Button(OverwriteStage)
-                {
-                    text = "Overwrite",
-                    tooltip = "Set stage equal to the current selection",
-                });
                 buttonColumns.Add(column);
             }
 
@@ -174,6 +174,11 @@ namespace JanSharp
                     style = { alignSelf = Align.Center },
                     tooltip = "How should the current stage affect the Selection?\n"
                         + "When nothing is selected within the stage, the entire stage is considered.",
+                });
+                column.Add(new Button(OverwriteSelection)
+                {
+                    text = "Overwrite",
+                    tooltip = "Set selection equal to the stage",
                 });
                 column.Add(new Button(AddToSelection)
                 {
@@ -201,11 +206,6 @@ namespace JanSharp
                     text = "Symmetric Diff",
                     tooltip = "The inverse of Intersect. Add staged objects to selection, "
                         + "then deselect objects that were both staged and selected previously",
-                });
-                column.Add(new Button(OverwriteSelection)
-                {
-                    text = "Overwrite",
-                    tooltip = "Set selection equal to the stage",
                 });
                 buttonColumns.Add(column);
             }
@@ -353,6 +353,11 @@ namespace JanSharp
         }
 
 
+        private void OverwriteStage()
+        {
+            OverwriteStageEntirely(Selection.objects);
+        }
+
         private void AddToStage()
         {
             BeginUndoAbleOperation("Add to Selection Stage");
@@ -392,11 +397,11 @@ namespace JanSharp
                 .ToList());
         }
 
-        private void OverwriteStage()
-        {
-            OverwriteStageEntirely(Selection.objects);
-        }
 
+        private void OverwriteSelection()
+        {
+            Selection.objects = SelectedInStage.ToArray();
+        }
 
         private void AddToSelection()
         {
@@ -425,11 +430,6 @@ namespace JanSharp
                 .Union(SelectedInStage)
                 .Except(selected.Intersect(SelectedInStage))
                 .ToArray();
-        }
-
-        private void OverwriteSelection()
-        {
-            Selection.objects = SelectedInStage.ToArray();
         }
 
 

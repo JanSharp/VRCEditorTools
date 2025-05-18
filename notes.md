@@ -17,4 +17,4 @@
 - [ ] select on double click or enter toggle
 - [ ] apparently I once had this idea for the selection stage, I don't actually think it's a good idea: dedup - remove objects part of the same prefab
 - [x] add sort based on hierarchy to selection stage
-- [ ] move overwrite button to the top in selection stage
+- [x] move overwrite button to the top in selection stage
