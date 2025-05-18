@@ -44,6 +44,11 @@ namespace JanSharp
             window.Show();
         }
 
+        private static bool IsAsset(Object obj)
+        {
+            return obj is not GameObject || AssetDatabase.IsMainAsset(obj);
+        }
+
         private static string GetHierarchyPath(Transform t, string prefix, string separator)
         {
             StringBuilder sb = new StringBuilder(prefix);
@@ -76,9 +81,9 @@ namespace JanSharp
             System.Action<VisualElement, int> bindItem = (element, index) =>
             {
                 Object obj = staged[index];
-                element.tooltip = obj is GameObject && !AssetDatabase.IsMainAsset(obj)
-                    ? GetHierarchyPath((obj as GameObject).transform, "Hierarchy:\n  ", "\n  ")
-                    : "Asset:\n  " + AssetDatabase.GetAssetPath(obj).Replace("/", "\n  ");
+                element.tooltip = IsAsset(obj)
+                    ? "Asset:\n  " + AssetDatabase.GetAssetPath(obj).Replace("/", "\n  ")
+                    : GetHierarchyPath(((GameObject)obj).transform, "Hierarchy:\n  ", "\n  ");
                 Image image = (Image)element[0];
                 Label label = (Label)element[1];
                 image.image = AssetPreview.GetMiniThumbnail(obj);
@@ -208,7 +213,8 @@ namespace JanSharp
                 VisualElement column = new VisualElement() { style = { flexGrow = 1f } };
                 column.Add(new Label("Within Stage") { style = { alignSelf = Align.Center }, });
                 column.Add(new Button(DeselectWithinStage) { text = "Deselect" });
-                column.Add(new Button(SortWithinStage) { text = "Sort", tooltip = "Sorts alphabetically, case insensitive" });
+                column.Add(new Button(SortWithinStageAlphabetically) { text = "Sort A", tooltip = "Sorts alphabetically, case insensitive" });
+                column.Add(new Button(SortWithinStageHierarchy) { text = "Sort H", tooltip = "Sorts based on hierarchy or asset path" });
                 column.Add(new Button(RemoveWithinStage) { text = "Remove" });
                 column.Add(new Button(ClearStage) { text = "Clear" });
                 countLabel = new Label(GetCountLabelText())
@@ -270,8 +276,8 @@ namespace JanSharp
         {
             int selectedCount = SelectedInStage.Count();
             return selectedCount == 0 || selectedCount == staged.Count
-                ? $"count:\n{staged.Count}"
-                : $"count:\n{selectedCount}/{staged.Count}";
+                ? $"{staged.Count}"
+                : $"{selectedCount}/{staged.Count}";
         }
 
         private void EndUndoAbleOperation()
@@ -439,12 +445,79 @@ namespace JanSharp
             }
         }
 
-        private void SortWithinStage()
+        private void SortWithinStageAlphabetically()
         {
             Cleanup();
             BeginUndoAbleOperation("Sort Selection Stage");
             HashSet<Object> selectedObjects = RememberStageSelection();
             staged.Sort(new ObjectComparer());
+            EndUndoAbleOperation();
+            MarkStagedLutAsUpToDate();
+            RestoreStageSelection(selectedObjects);
+            RefreshList();
+        }
+
+        private struct HierarchyAwareObject : System.IComparable<HierarchyAwareObject>
+        {
+            public Object obj;
+            public bool isAsset;
+            public string assetPath;
+            public List<int> hierarchyIndexes;
+
+            public HierarchyAwareObject(Object obj, bool isAsset, string assetPath, List<int> hierarchyIndexes)
+            {
+                this.obj = obj;
+                this.isAsset = isAsset;
+                this.assetPath = assetPath;
+                this.hierarchyIndexes = hierarchyIndexes;
+            }
+
+            public int CompareTo(HierarchyAwareObject other)
+            {
+                if (isAsset != other.isAsset)
+                    return isAsset ? 1 : -1;
+                if (isAsset)
+                    return assetPath.CompareTo(other.assetPath);
+                for (int i = 0; i < System.Math.Min(hierarchyIndexes.Count, other.hierarchyIndexes.Count); i++)
+                {
+                    int result = hierarchyIndexes[i].CompareTo(other.hierarchyIndexes[i]);
+                    if (result != 0)
+                        return result;
+                }
+                return hierarchyIndexes.Count.CompareTo(other.hierarchyIndexes.Count);
+            }
+        }
+
+        private void SortWithinStageHierarchy()
+        {
+            Cleanup();
+            BeginUndoAbleOperation("Sort Selection Stage");
+            HashSet<Object> selectedObjects = RememberStageSelection();
+            List<Object> newStaged = staged
+                .Select(obj =>
+                {
+                    bool isAsset = IsAsset(obj);
+                    string assetPath = isAsset ? AssetDatabase.GetAssetPath(obj).ToLower() : null;
+                    List<int> hierarchyIndexes = null;
+                    if (!isAsset)
+                    {
+                        hierarchyIndexes = new List<int>();
+                        void Add(Transform t)
+                        {
+                            if (t == null)
+                                return;
+                            Add(t.parent);
+                            hierarchyIndexes.Add(t.GetSiblingIndex());
+                        }
+                        Add(((GameObject)obj).transform);
+                    }
+                    return new HierarchyAwareObject(obj, isAsset, assetPath, hierarchyIndexes);
+                })
+                .OrderBy(o => o)
+                .Select(o => o.obj)
+                .ToList();
+            staged.Clear();
+            staged.AddRange(newStaged);
             EndUndoAbleOperation();
             MarkStagedLutAsUpToDate();
             RestoreStageSelection(selectedObjects);
