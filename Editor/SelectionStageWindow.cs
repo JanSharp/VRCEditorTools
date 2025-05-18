@@ -81,12 +81,13 @@ namespace JanSharp
             System.Action<VisualElement, int> bindItem = (element, index) =>
             {
                 Object obj = staged[index];
-                element.tooltip = IsAsset(obj)
+                string tooltip = IsAsset(obj)
                     ? "Asset:\n  " + AssetDatabase.GetAssetPath(obj).Replace("/", "\n  ")
                     : GetHierarchyPath(((GameObject)obj).transform, "Hierarchy:\n  ", "\n  ");
                 Image image = (Image)element[0];
                 Label label = (Label)element[1];
                 image.image = AssetPreview.GetMiniThumbnail(obj);
+                image.tooltip = tooltip; // Having the tooltip on the entire row is frankly annoying.
                 label.text = obj.name;
             };
             listView = new ListView(staged, 16, makeItem, bindItem)
