@@ -28,7 +28,19 @@ namespace JanSharp
                 return stagedLut;
             }
         }
+        private VisualElement root;
         private ListView listView;
+        private Box settingsBox = null;
+        private bool settingsVisible = false;
+        private DropdownField onSubmitBehaviorDropdown;
+        private enum SubmitBehavior
+        {
+            DeselectInStageAndJustPing,
+            DeselectInStageAndSelect,
+            NoOpInStageAndJustPing,
+            NoOpInStageAndSelect,
+        }
+        private Toggle treatSelectionChangeInStageAsSubmit;
         private List<object> listViewSelected = new List<object>();
         private IEnumerable<Object> SelectedInStage => listViewSelected.Any(obj => obj != null)
             ? listViewSelected.Where(obj => obj != null).Cast<Object>()
@@ -67,7 +79,7 @@ namespace JanSharp
 
         private void CreateGUI()
         {
-            VisualElement root = rootVisualElement;
+            root = rootVisualElement;
 
             Box listBox = new Box() { style = { flexGrow = 1f } };
 
@@ -95,34 +107,43 @@ namespace JanSharp
                 style = { flexGrow = 1f },
                 selectionType = SelectionType.Multiple,
             };
-            listView.itemsChosen += obj =>
+            void ItemsChosen(IEnumerable<object> objs)
             {
-                Object go = (Object)obj.FirstOrDefault();
-                if (go == null)
+                if (!objs.Any())
                     return;
+
+                SubmitBehavior submitBehavior = (SubmitBehavior)onSubmitBehaviorDropdown.index;
+                bool deselectInStage = submitBehavior == SubmitBehavior.DeselectInStageAndJustPing
+                    || submitBehavior == SubmitBehavior.DeselectInStageAndSelect;
+                bool selectInSelection = submitBehavior == SubmitBehavior.DeselectInStageAndSelect
+                    || submitBehavior == SubmitBehavior.NoOpInStageAndSelect;
+
+                Object go = (Object)objs.FirstOrDefault();
                 EditorGUIUtility.PingObject(go); // Jump to in hierarchy, without selecting.
                 var prev = Selection.objects;
                 Selection.activeObject = go;
                 SceneView.FrameLastActiveSceneView(); // Does nothing if the selected object is not in the hierarchy.
-                Selection.objects = prev;
-                if (listViewSelected.Count == 1 && ((Object)listViewSelected[0]) == go)
+                Selection.objects = selectInSelection ? objs.Cast<Object>().ToArray() : prev;
+
+                if (deselectInStage)
                 {
-                    // When double clicking a single element, clear the selection again as to prevent
-                    // accidentally narrowing the stage through having only 1 element selected.
                     listView.ClearSelection();
                     RefreshListWithoutUndo();
                 }
-            };
+            }
+            listView.itemsChosen += ItemsChosen;
             listView.selectionChanged += selected =>
             {
                 listViewSelected = selected.ToList();
                 countLabel.text = GetCountLabelText();
+                if (treatSelectionChangeInStageAsSubmit.value)
+                    ItemsChosen(selected);
             };
             listBox.Add(listView);
 
             root.Add(listBox);
 
-            Box buttonsBox = new Box() { style = { flexShrink = 0f } };
+            Box buttonsBox = new Box() { style = { flexShrink = 0f, marginTop = 2f } };
             VisualElement buttonColumns = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
 
             {
@@ -218,6 +239,7 @@ namespace JanSharp
                 column.Add(new Button(SortWithinStageHierarchy) { text = "Sort H", tooltip = "Sorts based on hierarchy or asset path" });
                 column.Add(new Button(RemoveWithinStage) { text = "Remove" });
                 column.Add(new Button(ClearStage) { text = "Clear" });
+                column.Add(new Button(ToggleStageSettings) { text = "Settings" });
                 countLabel = new Label(GetCountLabelText())
                 {
                     style = {
@@ -232,6 +254,19 @@ namespace JanSharp
 
             buttonsBox.Add(buttonColumns);
             root.Add(buttonsBox);
+
+            settingsBox = new Box() { style = { flexShrink = 0f, marginTop = 2f } };
+            onSubmitBehaviorDropdown = new DropdownField("On enter/double click", new List<string>()
+            {
+                "Deselect (stage), Just ping",
+                "Deselect (stage), Select",
+                "No-Op (stage), Just ping",
+                "No-Op (stage), Select",
+            }, (int)SubmitBehavior.DeselectInStageAndJustPing);
+            settingsBox.Add(onSubmitBehaviorDropdown);
+            treatSelectionChangeInStageAsSubmit = new Toggle("Treat selection change as enter/double click");
+            settingsBox.Add(treatSelectionChangeInStageAsSubmit);
+            // Not added to root, gets added and removed through a "toggle".
 
             Undo.undoRedoPerformed -= OnUndoRedo;
             Undo.undoRedoPerformed += OnUndoRedo;
@@ -540,6 +575,15 @@ namespace JanSharp
             MarkStagedLutAsUpToDate();
             listView.ClearSelection();
             RefreshList();
+        }
+
+        private void ToggleStageSettings()
+        {
+            settingsVisible = !settingsVisible;
+            if (settingsVisible)
+                root.Add(settingsBox);
+            else
+                root.Remove(settingsBox);
         }
 
 

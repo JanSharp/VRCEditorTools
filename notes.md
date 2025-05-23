@@ -14,7 +14,7 @@
 - [ ] create parent creates a transform when it should create a rect transform
 - [x] fix selection stage flex layout pushing the bottom frame and all the buttons off the window when there's lots of elemepts in the list above
 - [ ] Editor window to show all objects marked as editor only as well as putting them in a list
-- [ ] select on double click or enter toggle
+- [x] select on double click or enter toggle for selection stage
 - [ ] apparently I once had this idea for the selection stage, I don't actually think it's a good idea: dedup - remove objects part of the same prefab
 - [x] add sort based on hierarchy to selection stage
 - [x] move overwrite button to the top in selection stage
