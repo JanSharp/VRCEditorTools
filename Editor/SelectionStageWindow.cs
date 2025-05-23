@@ -235,8 +235,14 @@ namespace JanSharp
                 VisualElement column = new VisualElement() { style = { flexGrow = 1f } };
                 column.Add(new Label("Within Stage") { style = { alignSelf = Align.Center }, });
                 column.Add(new Button(DeselectWithinStage) { text = "Deselect" });
-                column.Add(new Button(SortWithinStageAlphabetically) { text = "Sort A", tooltip = "Sorts alphabetically, case insensitive" });
-                column.Add(new Button(SortWithinStageHierarchy) { text = "Sort H", tooltip = "Sorts based on hierarchy or asset path" });
+
+                GenericDropdownMenu sortMenu = new GenericDropdownMenu();
+                sortMenu.AddItem("Sort alphabetically", false, SortWithinStageAlphabetically);
+                sortMenu.AddItem("Sort based on hierarchy", false, SortWithinStageHierarchy);
+                Button sortButton = new Button() { text = "Sort" };
+                sortButton.clicked += () => sortMenu.DropDown(sortButton.worldBound, sortButton, anchored: false);
+                column.Add(sortButton);
+
                 column.Add(new Button(RemoveWithinStage) { text = "Remove" });
                 column.Add(new Button(ClearStage) { text = "Clear" });
                 column.Add(new Button(ToggleStageSettings) { text = "Settings" });
