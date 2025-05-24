@@ -1,6 +1,31 @@
 
 # Changelog
 
+## [1.3.3] - 2025-05-24
+
+### Changed
+
+- Retain selected objects in SelectionStage on sort or removal ([`4e8a31d`](https://github.com/JanSharp/VRCEditorTools/commit/4e8a31d70d522457521a69a24c7bf0a80227017a))
+- Make SelectionStage refresh on renames ([`d74ae83`](https://github.com/JanSharp/VRCEditorTools/commit/d74ae8329c1282995fb31a2d910b851b4ecee855))
+- Move overwrite buttons all the way to the top ([`e7a8faa`](https://github.com/JanSharp/VRCEditorTools/commit/e7a8faaca0e2d2c6c8fc0960efaf27a123607685))
+
+### Added
+
+- Add WIP tools editor window with a prefab instance search ([`c4c79af`](https://github.com/JanSharp/VRCEditorTools/commit/c4c79affea7c42f35e69a37f63e0007696a82910))
+- Add support for non game objects in SelectionStage ([`b70fb7b`](https://github.com/JanSharp/VRCEditorTools/commit/b70fb7b254f553a73e5807fd86d44c8908e161a0))
+- Add options for how submit should behave in stage ([`16fc030`](https://github.com/JanSharp/VRCEditorTools/commit/16fc03053c92cca1a3d28be32f1d166f124fc515))
+- Add hierarchy/asset path sort to SelectionStage ([`9f9b845`](https://github.com/JanSharp/VRCEditorTools/commit/9f9b84546b8cc66639f79e26176f38ff42e21af6), [`8b31548`](https://github.com/JanSharp/VRCEditorTools/commit/8b3154864bd55bb5786b56f7c1289fe141ccde95))
+- Add hierarchy/asset path tooltip in SelectionStage ([`86519e8`](https://github.com/JanSharp/VRCEditorTools/commit/86519e85402ba9efc7e5829158b6e4c1bbd6dbd0), [`c89efca`](https://github.com/JanSharp/VRCEditorTools/commit/c89efca82c0d6e97055d6b6a8d8719ef301e2634))
+- Add tooltips to most buttons in SelectionStage ([`ba35dfb`](https://github.com/JanSharp/VRCEditorTools/commit/ba35dfb827d91eb9b331862eb77daf669b6a1589))
+
+### Removed
+
+- Remove Create Parent because Unity 2022 already has it ([`3ac7039`](https://github.com/JanSharp/VRCEditorTools/commit/3ac7039500f06657baacb727e4eef6f228ad0ffb))
+
+### Fixed
+
+- Fix Selection Stage buttons being moved off screen ([`7f61400`](https://github.com/JanSharp/VRCEditorTools/commit/7f614001ef8dc362621c1a9d3a089023ef75b060))
+
 ## [1.3.2] - 2025-04-26
 
 ### Fixed
@@ -124,6 +149,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.3]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.3
 [1.3.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.2
 [1.3.1]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.1
 [1.3.0]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.0
