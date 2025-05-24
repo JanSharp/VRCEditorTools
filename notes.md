@@ -18,7 +18,7 @@
 - [ ] apparently I once had this idea for the selection stage, I don't actually think it's a good idea: dedup - remove objects part of the same prefab
 - [x] add sort based on hierarchy to selection stage
 - [x] move overwrite button to the top in selection stage
-- [ ] tool to find all instances of a given prefab
+- [x] tool to find all instances of a given prefab
 - [ ] tool to find all usage of a given material in a scene
 - [ ] tool to find all usage of a given shader in a scene
 - [ ] tool to find all materials using a given shader
