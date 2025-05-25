@@ -270,7 +270,7 @@ namespace JanSharp
             buttonsBox.Add(buttonColumns);
             root.Add(buttonsBox);
 
-            settingsBox = new Box() { style = { flexShrink = 0f, marginTop = 2f } };
+            settingsBox = new Box() { style = { flexShrink = 0f, marginTop = 2f, display = DisplayStyle.None } };
             onSubmitBehaviorDropdown = new DropdownField("On enter/double click", new List<string>()
             {
                 "Deselect (stage), Just ping",
@@ -281,7 +281,7 @@ namespace JanSharp
             settingsBox.Add(onSubmitBehaviorDropdown);
             treatSelectionChangeInStageAsSubmit = new Toggle("Treat selection change as enter/double click");
             settingsBox.Add(treatSelectionChangeInStageAsSubmit);
-            // Not added to root, gets added and removed through a "toggle".
+            root.Add(settingsBox);
 
             Undo.undoRedoPerformed -= OnUndoRedo;
             Undo.undoRedoPerformed += OnUndoRedo;
@@ -595,10 +595,7 @@ namespace JanSharp
         private void ToggleStageSettings()
         {
             settingsVisible = !settingsVisible;
-            if (settingsVisible)
-                root.Add(settingsBox);
-            else
-                root.Remove(settingsBox);
+            settingsBox.style.display = settingsVisible ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
 
