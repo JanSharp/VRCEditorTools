@@ -1,6 +1,17 @@
 
 # Changelog
 
+## [1.3.4] - 2025-05-25
+
+### Added
+
+- Add WIP tool to find materials using given texture ([`37dfe87`](https://github.com/JanSharp/VRCEditorTools/commit/37dfe87e9e5c8c6342e2516266689b186fdeff74))
+- Make WIP tool searches open results stage even for 0 results ([`330377d`](https://github.com/JanSharp/VRCEditorTools/commit/330377d4c6c68540479835dc00872808e732c23d))
+
+### Fixed
+
+- Fix selection stage sometimes moving scene view on asset ping ([`a4b2a6c`](https://github.com/JanSharp/VRCEditorTools/commit/a4b2a6cdb5b788305deab28c87fcffa3675fac4e))
+
 ## [1.3.3] - 2025-05-24
 
 ### Changed
@@ -149,6 +160,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.4]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.4
 [1.3.3]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.3
 [1.3.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.2
 [1.3.1]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.1
