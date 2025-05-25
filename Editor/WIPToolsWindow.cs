@@ -77,10 +77,55 @@ namespace JanSharp
         private static GameObject[] FindPrefabInstances(GUID prefabAssetGUID)
             => FindPrefabInstances(AssetDatabase.GUIDToAssetPath(prefabAssetGUID));
 
+        private void CreateMaterialsUsingATexture()
+        {
+            Box box = new Box();
+            Foldout foldout = new Foldout() { text = "Find Materials using given Texture", value = false };
+            ObjectField textureObjField = new ObjectField("Texture to Find")
+            {
+                allowSceneObjects = false,
+                objectType = typeof(Texture),
+            };
+            foldout.Add(textureObjField);
+            Label resultCount = null;
+            void FindPrefabs()
+            {
+                List<Object> foundMaterials = new List<Object>();
+                Texture textureToFind = (Texture)textureObjField.value;
+                if (textureToFind == null)
+                    return;
+                string[] guids = AssetDatabase.FindAssets("t:material");
+                foreach (string guid in guids)
+                {
+                    Material material = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(guid));
+                    foreach (string propName in material.GetPropertyNames(MaterialPropertyType.Texture))
+                        if (material.GetTexture(propName) == textureToFind)
+                        {
+                            foundMaterials.Add(material);
+                            break;
+                        }
+                }
+                resultCount.text = $"Found Count: {foundMaterials.Count}";
+                SearchIntoSelectionStage(foundMaterials);
+            }
+            foldout.Add(new Button(FindPrefabs) { text = "Search into Selection Stage" });
+            resultCount = new Label("Found Count: ?");
+            foldout.Add(resultCount);
+            box.Add(foldout);
+            root.Add(box);
+        }
+
+        private void AddVerticalSpacer(VisualElement parent)
+        {
+            parent.Add(new VisualElement() { style = { height = 4 } });
+        }
+
         public void CreateGUI()
         {
             root = new ScrollView();
             CreateFindPrefabInstancesGUI();
+            AddVerticalSpacer(root);
+            CreateMaterialsUsingATexture();
             rootVisualElement.Add(root);
         }
     }
