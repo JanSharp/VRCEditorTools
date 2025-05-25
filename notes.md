@@ -22,4 +22,4 @@
 - [ ] tool to find all usage of a given material in a scene
 - [ ] tool to find all usage of a given shader in a scene
 - [ ] tool to find all materials using a given shader
-- [ ] don't jump the scene view when pinging assets in selection stage
+- [x] don't jump the scene view when pinging assets in selection stage

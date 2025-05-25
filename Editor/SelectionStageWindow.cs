@@ -120,10 +120,19 @@ namespace JanSharp
 
                 Object go = (Object)objs.FirstOrDefault();
                 EditorGUIUtility.PingObject(go); // Jump to in hierarchy, without selecting.
-                var prev = Selection.objects;
-                Selection.activeObject = go;
-                SceneView.FrameLastActiveSceneView(); // Does nothing if the selected object is not in the hierarchy.
-                Selection.objects = selectInSelection ? objs.Cast<Object>().ToArray() : prev;
+
+                Object[] prevSelection = null;
+                if (!IsAsset(go))
+                {
+                    prevSelection = Selection.objects;
+                    Selection.activeObject = go;
+                    SceneView.FrameLastActiveSceneView();
+                }
+
+                if (selectInSelection)
+                    Selection.objects = objs.Cast<Object>().ToArray();
+                else if (prevSelection != null)
+                    Selection.objects = prevSelection;
 
                 if (deselectInStage)
                 {
