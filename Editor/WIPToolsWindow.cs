@@ -23,8 +23,6 @@ namespace JanSharp
 
         private void SearchIntoSelectionStage(ICollection<Object> results)
         {
-            if (results.Count == 0)
-                return;
             if (selectionStage == null)
             {
                 selectionStage = CreateWindow<SelectionStageWindow>(typeof(WIPToolsWindow));
@@ -45,8 +43,7 @@ namespace JanSharp
                 objectType = typeof(GameObject),
             };
             foldout.Add(prefabObjField);
-            Label resultCount = null;
-            void FindPrefabs()
+            foldout.Add(new Button(() =>
             {
                 if (prefabObjField.value == null)
                     return;
@@ -54,12 +51,9 @@ namespace JanSharp
                 if (assetPath == null)
                     return;
                 GameObject[] objs = FindPrefabInstances(assetPath);
-                resultCount.text = $"Found Count: {objs.Length}";
                 SearchIntoSelectionStage(objs);
-            }
-            foldout.Add(new Button(FindPrefabs) { text = "Search into Selection Stage" });
-            resultCount = new Label("Found Count: ?");
-            foldout.Add(resultCount);
+            })
+            { text = "Search into Selection Stage" });
             box.Add(foldout);
             root.Add(box);
         }
@@ -87,8 +81,7 @@ namespace JanSharp
                 objectType = typeof(Texture),
             };
             foldout.Add(textureObjField);
-            Label resultCount = null;
-            void FindPrefabs()
+            foldout.Add(new Button(() =>
             {
                 List<Object> foundMaterials = new List<Object>();
                 Texture textureToFind = (Texture)textureObjField.value;
@@ -105,12 +98,9 @@ namespace JanSharp
                             break;
                         }
                 }
-                resultCount.text = $"Found Count: {foundMaterials.Count}";
                 SearchIntoSelectionStage(foundMaterials);
-            }
-            foldout.Add(new Button(FindPrefabs) { text = "Search into Selection Stage" });
-            resultCount = new Label("Found Count: ?");
-            foldout.Add(resultCount);
+            })
+            { text = "Search into Selection Stage" });
             box.Add(foldout);
             root.Add(box);
         }
