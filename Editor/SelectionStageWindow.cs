@@ -56,7 +56,7 @@ namespace JanSharp
             window.Show();
         }
 
-        private static bool IsAsset(Object obj)
+        public static bool IsAsset(Object obj)
         {
             return obj is not GameObject || AssetDatabase.IsMainAsset(obj);
         }
@@ -539,12 +539,9 @@ namespace JanSharp
             }
         }
 
-        private void SortWithinStageHierarchy()
+        public static List<Object> SortByHierarchy(IEnumerable<Object> toSort)
         {
-            Cleanup();
-            BeginUndoAbleOperation("Sort Selection Stage");
-            HashSet<Object> selectedObjects = RememberStageSelection();
-            List<Object> newStaged = staged
+            return toSort
                 .Select(obj =>
                 {
                     bool isAsset = IsAsset(obj);
@@ -567,6 +564,14 @@ namespace JanSharp
                 .OrderBy(o => o)
                 .Select(o => o.obj)
                 .ToList();
+        }
+
+        private void SortWithinStageHierarchy()
+        {
+            Cleanup();
+            BeginUndoAbleOperation("Sort Selection Stage");
+            HashSet<Object> selectedObjects = RememberStageSelection();
+            List<Object> newStaged = SortByHierarchy(staged);
             staged.Clear();
             staged.AddRange(newStaged);
             EndUndoAbleOperation();
