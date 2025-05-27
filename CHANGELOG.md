@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.3.5] - 2025-05-27
+
+### Added
+
+- Add Move Prev Selection Into Here context menu item ([`1000c18`](https://github.com/JanSharp/VRCEditorTools/commit/1000c18c2cea3e0d00421759001b90cb99b60152))
+
 ## [1.3.4] - 2025-05-25
 
 ### Added
@@ -160,6 +166,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.5]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.5
 [1.3.4]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.4
 [1.3.3]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.3
 [1.3.2]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.2
