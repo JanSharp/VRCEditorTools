@@ -19,7 +19,6 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
 - BulkReplaceWindow to quickly replace many objects with another prefab
 - Select Particle Systems based on their culling mode
 - Save Cached Unity Asset Changes is a tiny editor script to write any asset file changes unity has cached in memory to the drive
-- Create Parent menu item next to Create Empty, creating an empty game object which becomes the parent of all selected objects
 - Selection Stage editor window to effectively have a second much more manually controlled list of selected objects
 - Print Component Class names to quickly get the component names to be able to search for all objects with that component in the scene
 - Print Selected Count to simply figure out how many objects are selected
@@ -28,3 +27,7 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
 - Generate Basic Culling LODs to quickly generate LOD Groups for selected objects simply culling all renderers at 4%
 - Copy/Paste Cull Percentage in the context menu for LOD Groups to quickly modify culling distances for multiple basic culling LOD Groups
 - References Window to see which components and game objects are referenced by other components, as well as seeing what references are crossing the boundry of inside and outside a tree of game objects in either direction
+- WIP Tools Window, tool which may be useful however they may not be in their final state or location, or they aren't the best quality wise
+  - Find instances of a given prefab in the scene
+  - Find materials using a given texture
+- Context menu item when right clicking objects in the hierarchy to move previously selected objects into the right clicked object as children
