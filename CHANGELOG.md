@@ -1,6 +1,16 @@
 
 # Changelog
 
+## [1.3.6] - 2025-05-28
+
+### Changed
+
+- Update readme ([`7bfad9b`](https://github.com/JanSharp/VRCEditorTools/commit/7bfad9b9973a0c74c602791664bcfd2539845bd2))
+
+### Fixed
+
+- Fix move prev selection not ignoring prefab assets ([`4172f41`](https://github.com/JanSharp/VRCEditorTools/commit/4172f414ef43eebf4ecab62f25796f94bfad1007))
+
 ## [1.3.5] - 2025-05-27
 
 ### Added
@@ -166,6 +176,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.6]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.6
 [1.3.5]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.5
 [1.3.4]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.4
 [1.3.3]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.3
