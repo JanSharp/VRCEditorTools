@@ -40,7 +40,7 @@ namespace JanSharp
             if (previousSelection.Length == 0 || currentSelection.Length != 1)
                 return false;
             HashSet<GameObject> toIgnore = GetToIgnoreLut();
-            return previousSelection.Any(go => !toIgnore.Contains(go))
+            return previousSelection.Any(go => !toIgnore.Contains(go) && !SelectionStageWindow.IsAsset(go))
                 && !previousSelection.Contains(currentSelection[0]);
         }
 
@@ -52,7 +52,7 @@ namespace JanSharp
             toMove.Clear();
             Transform targetTransform = currentSelection[0].transform;
             foreach (Object obj in sorted)
-                if (!toIgnore.Contains(obj))
+                if (!toIgnore.Contains(obj) && !SelectionStageWindow.IsAsset(obj))
                     Undo.SetTransformParent(((GameObject)obj).transform, targetTransform, "Move Prev Selection Into Here");
         }
     }
