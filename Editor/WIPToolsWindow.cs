@@ -71,7 +71,7 @@ namespace JanSharp
         private static GameObject[] FindPrefabInstances(GUID prefabAssetGUID)
             => FindPrefabInstances(AssetDatabase.GUIDToAssetPath(prefabAssetGUID));
 
-        private void CreateMaterialsUsingATexture()
+        private void CreateFindMaterialsUsingATextureGUI()
         {
             Box box = new Box();
             Foldout foldout = new Foldout() { text = "Find Materials using given Texture", value = false };
@@ -115,7 +115,7 @@ namespace JanSharp
             root = new ScrollView();
             CreateFindPrefabInstancesGUI();
             AddVerticalSpacer(root);
-            CreateMaterialsUsingATexture();
+            CreateFindMaterialsUsingATextureGUI();
             rootVisualElement.Add(root);
         }
     }
