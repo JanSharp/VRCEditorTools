@@ -26,7 +26,7 @@ namespace JanSharp
             "Character",
             // "AnimationCurve",
             "Bounds",
-            // "Gradient", // Don't know how to get its value.
+            "Gradient",
             "Quaternion",
             // "ExposedReference",
             // "FixedBufferSize",
@@ -56,7 +56,7 @@ namespace JanSharp
             SerializedPropertyType.Character,
             // SerializedPropertyType.AnimationCurve,
             SerializedPropertyType.Bounds,
-            // SerializedPropertyType.Gradient,
+            SerializedPropertyType.Gradient,
             SerializedPropertyType.Quaternion,
             // SerializedPropertyType.ExposedReference,
             // SerializedPropertyType.FixedBufferSize,
@@ -242,7 +242,7 @@ namespace JanSharp
                     boundsValue = property.boundsValue;
                     break;
                 case SerializedPropertyType.Gradient:
-                    // gradientValue = property.; // TODO: how do you get the gradient value?
+                    gradientValue = property.gradientValue;
                     break;
                 case SerializedPropertyType.Quaternion:
                     quaternionValue = property.quaternionValue;
@@ -422,8 +422,8 @@ namespace JanSharp
                     return property.stringValue == characterValue;
                 case SerializedPropertyType.Bounds:
                     return property.boundsValue == boundsValue;
-                // case SerializedPropertyType.Gradient: // How to get the gradient value?
-                //     return property.;
+                case SerializedPropertyType.Gradient:
+                    return property.gradientValue == gradientValue;
                 case SerializedPropertyType.Quaternion:
                     return property.quaternionValue == quaternionValue;
                 case SerializedPropertyType.Vector2Int:
