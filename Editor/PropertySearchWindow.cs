@@ -17,7 +17,7 @@ namespace JanSharp
             "Color",
             "ObjectReference",
             "LayerMask",
-            // "Enum",
+            "Enum",
             "Vector2",
             "Vector3",
             "Vector4",
@@ -47,7 +47,7 @@ namespace JanSharp
             SerializedPropertyType.Color,
             SerializedPropertyType.ObjectReference,
             SerializedPropertyType.LayerMask,
-            // SerializedPropertyType.Enum,
+            SerializedPropertyType.Enum,
             SerializedPropertyType.Vector2,
             SerializedPropertyType.Vector3,
             SerializedPropertyType.Vector4,
@@ -87,7 +87,7 @@ namespace JanSharp
         [SerializeField] private Color colorValue;
         [SerializeField] private Object objectReferenceValue;
         [SerializeField] private int layerMaskValue;
-        [SerializeField] private long enumValue;
+        [SerializeField] private int enumValue;
         [SerializeField] private Vector2 vector2Value;
         [SerializeField] private Vector3 vector3Value;
         [SerializeField] private Vector4 vector4Value;
@@ -220,9 +220,9 @@ namespace JanSharp
                 case SerializedPropertyType.LayerMask:
                     layerMaskValue = property.intValue;
                     break;
-                // case SerializedPropertyType.Enum: // this is wrong, enums would require more special handling.
-                //     enumValue = property.longValue;
-                //     break;
+                case SerializedPropertyType.Enum:
+                    enumValue = property.enumValueFlag;
+                    break;
                 case SerializedPropertyType.Vector2:
                     vector2Value = property.vector2Value;
                     break;
@@ -291,9 +291,9 @@ namespace JanSharp
                 case SerializedPropertyType.LayerMask:
                     EditorGUILayout.PropertyField(proxy.FindProperty(nameof(layerMaskValue)));
                     break;
-                // case SerializedPropertyType.Enum: // this is wrong, enums would require more special handling.
-                //     EditorGUILayout.PropertyField(proxy.FindProperty(nameof(enumValue)));
-                //     break;
+                case SerializedPropertyType.Enum:
+                    EditorGUILayout.PropertyField(proxy.FindProperty(nameof(enumValue)));
+                    break;
                 case SerializedPropertyType.Vector2:
                     EditorGUILayout.PropertyField(proxy.FindProperty(nameof(vector2Value)));
                     break;
@@ -408,8 +408,8 @@ namespace JanSharp
                     return property.objectReferenceValue == objectReferenceValue;
                 case SerializedPropertyType.LayerMask:
                     return property.intValue == layerMaskValue;
-                // case SerializedPropertyType.Enum:
-                //     return property.enum;
+                case SerializedPropertyType.Enum:
+                    return property.enumValueFlag == enumValue;
                 case SerializedPropertyType.Vector2:
                     return property.vector2Value == vector2Value;
                 case SerializedPropertyType.Vector3:
