@@ -1,6 +1,14 @@
 
 # Changelog
 
+## [1.3.7] - 2025-07-05
+
+### Added
+
+- Add basic enum support to PropertySearchWindow ([`8dfb04b`](https://github.com/JanSharp/VRCEditorTools/commit/8dfb04bcd41b6d3ef7fae8bfa6a09e17e78b46d5))
+- Add Gradient support to PropertySearchWindow ([`93baf48`](https://github.com/JanSharp/VRCEditorTools/commit/93baf48a790821497362db7e5deaf1a10811415c))
+- Add Hash128 support to PropertySearchWindow, new with unity 2022 ([`df2c883`](https://github.com/JanSharp/VRCEditorTools/commit/df2c883db3b0129eef63c5cf8559fb466606f00a))
+
 ## [1.3.6] - 2025-05-28
 
 ### Changed
@@ -176,6 +184,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.7]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.7
 [1.3.6]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.6
 [1.3.5]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.5
 [1.3.4]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.4
