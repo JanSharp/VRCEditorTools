@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 namespace JanSharp
 {
@@ -35,6 +35,7 @@ namespace JanSharp
             "RectInt",
             "BoundsInt",
             // "ManagedReference",
+            "Hash128",
         };
         private static SerializedPropertyType[] propertyTypes = new SerializedPropertyType[]
         {
@@ -64,6 +65,7 @@ namespace JanSharp
             SerializedPropertyType.RectInt,
             SerializedPropertyType.BoundsInt,
             // SerializedPropertyType.ManagedReference,
+            SerializedPropertyType.Hash128,
         };
         private static Dictionary<SerializedPropertyType, int> propertyTypeIndexMap = null;
         private int selectedPropertyTypeIndex = 0;
@@ -98,6 +100,7 @@ namespace JanSharp
         [SerializeField] private Vector3Int vector3IntValue;
         [SerializeField] private RectInt rectIntValue;
         [SerializeField] private BoundsInt boundsIntValue;
+        [SerializeField] private Hash128 hash128Value;
 
         private int foundCount = -1;
         private SelectionStageWindow selectionStage;
@@ -256,6 +259,9 @@ namespace JanSharp
                 case SerializedPropertyType.BoundsInt:
                     boundsIntValue = property.boundsIntValue;
                     break;
+                case SerializedPropertyType.Hash128:
+                    hash128Value = property.hash128Value;
+                    break;
             }
         }
 
@@ -323,6 +329,9 @@ namespace JanSharp
                     break;
                 case SerializedPropertyType.BoundsInt:
                     EditorGUILayout.PropertyField(proxy.FindProperty(nameof(boundsIntValue)));
+                    break;
+                case SerializedPropertyType.Hash128:
+                    EditorGUILayout.PropertyField(proxy.FindProperty(nameof(hash128Value)));
                     break;
                 default:
                     break;
@@ -425,6 +434,8 @@ namespace JanSharp
                     return property.rectIntValue.Equals(rectIntValue); // Idk why RectInt doesn't have ==, but Equals should work.
                 case SerializedPropertyType.BoundsInt:
                     return property.boundsIntValue == boundsIntValue;
+                case SerializedPropertyType.Hash128:
+                    return property.hash128Value == hash128Value;
                 default:
                     return false;
             }
