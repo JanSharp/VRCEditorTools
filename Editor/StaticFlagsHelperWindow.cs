@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using UnityEditor;
-using UnityEngine.UIElements;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace JanSharp
 {
@@ -53,7 +53,8 @@ namespace JanSharp
 
         private VisualElement CreateFlagPlusToggleList(System.Func<PerFlagData, TogglePair> getPair, string headerPrefix)
         {
-            VisualElement columns = new VisualElement() {
+            VisualElement columns = new VisualElement()
+            {
                 style = {
                     flexDirection = FlexDirection.Row,
                     alignContent = Align.Center,
@@ -99,7 +100,8 @@ namespace JanSharp
 
             foldout.Add(CreateFlagPlusToggleList(data => data.visibilityToggles, "Is"));
 
-            VisualElement buttonRow = new VisualElement() {
+            VisualElement buttonRow = new VisualElement()
+            {
                 style = {
                     flexDirection = FlexDirection.Row,
                     alignContent = Align.Center,
@@ -122,7 +124,8 @@ namespace JanSharp
 
             foldout.Add(CreateFlagPlusToggleList(data => data.modificationToggles, "Do"));
 
-            VisualElement columns = new VisualElement() {
+            VisualElement columns = new VisualElement()
+            {
                 style = {
                     flexDirection = FlexDirection.Row,
                     alignContent = Align.Center,
@@ -198,8 +201,8 @@ namespace JanSharp
         {
             // Lazy Linq user alert.
             return Selection.gameObjects
-                .SelectMany(go => go.transform.GetComponentsInChildren<Transform>(includeInactive: true)
-                .Select(t => t.gameObject));
+                .SelectMany(go => go.transform.GetComponentsInChildren<Transform>(includeInactive: true))
+                .Select(t => t.gameObject);
         }
 
         private void Apply() => ApplyInternal(Selection.gameObjects);
