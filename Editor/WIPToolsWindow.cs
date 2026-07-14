@@ -1,10 +1,12 @@
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.UIElements;
-using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace JanSharp
 {
@@ -105,6 +107,64 @@ namespace JanSharp
             root.Add(box);
         }
 
+        private void CreateGenerateHiddenChangesConfGUI()
+        {
+            Box box = new Box();
+            Foldout foldout = new Foldout() { text = "Generate Hidden Changes Conf", value = false };
+
+            foldout.Add(
+                new Label("Overwrites the hidden_changes.conf file in the root of the project!\n"
+                    + "Custom content past the line '# Custom' will be kept.\n"
+                    + "This adds all UdonSharp asset files to the list of hidden changes because it is "
+                    + "nonsensical for those changes to be part of version control.")
+                { style = { whiteSpace = WhiteSpace.Normal } });
+
+            foldout.Add(new Button(() =>
+            {
+                const string CustomContentHeader = "\n# Custom\n";
+                string customContent = CustomContentHeader
+                    + "# Anything added below will not be overwritten by the script\n"
+                    + "# which generates the list of all UdonSharp asset files above.\n";
+                if (File.Exists("hidden_changes.conf"))
+                {
+                    customContent = File.ReadAllText("hidden_changes.conf");
+                    int index = customContent.IndexOf(CustomContentHeader);
+                    if (index != -1)
+                        customContent = customContent.Substring(index);
+                }
+
+                StringBuilder sb = new();
+                sb.Append('\n'); // Platform independent, unlike AppendLine, good for source control.
+                sb.Append("# UdonSharp asset files\n");
+                sb.Append("#\n");
+                sb.Append("# This list is generated, do not modify it manually.");
+                sb.Append("#\n");
+                sb.Append("# Their existence is not auto generated, neither is their name nor script reference.\n");
+                sb.Append("# However the rest of the content is auto generated and is irrelevant for source control.\n");
+                sb.Append("# Hiding their changes prevents needless changes getting checked in and causing conflicts.\n");
+                sb.Append("#\n");
+                int ignoredFileCount = 0;
+                foreach (string guid in AssetDatabase.FindAssets("t:UdonSharpProgramAsset"))
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(guid); // Always uses forward slashes, yay!
+                    if (!File.Exists(path)) // Part of something weird, can safely ignore.
+                        continue;
+                    sb.Append(path);
+                    sb.Append('\n');
+                    ignoredFileCount++;
+                }
+                sb.Append("# End of generated list of UdonSharp asset files\n");
+                sb.Append(customContent);
+                File.WriteAllText("hidden_changes.conf", sb.ToString());
+
+                Debug.Log($"Generated hidden_changes.conf file for {ignoredFileCount} UdonSharp asset files.");
+            })
+            { text = "Generate" });
+
+            box.Add(foldout);
+            root.Add(box);
+        }
+
         private void AddVerticalSpacer(VisualElement parent)
         {
             parent.Add(new VisualElement() { style = { height = 4 } });
@@ -116,6 +176,8 @@ namespace JanSharp
             CreateFindPrefabInstancesGUI();
             AddVerticalSpacer(root);
             CreateFindMaterialsUsingATextureGUI();
+            AddVerticalSpacer(root);
+            CreateGenerateHiddenChangesConfGUI();
             rootVisualElement.Add(root);
         }
     }
