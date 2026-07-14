@@ -149,6 +149,7 @@ namespace JanSharp
                     string path = AssetDatabase.GUIDToAssetPath(guid); // Always uses forward slashes, yay!
                     if (!File.Exists(path)) // Part of something weird, can safely ignore.
                         continue;
+                    sb.Append('/'); // Leading slash to root it at the project root, pretty sure.
                     sb.Append(path);
                     sb.Append('\n');
                     ignoredFileCount++;
