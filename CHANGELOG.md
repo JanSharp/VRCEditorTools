@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.3.8] - 2026-07-14
+
+### Added
+
+- Add WIP tool to generate hidden_changes.conf to ignore changes made to UdonSharp asset files in plastic version control ([`b470253`](https://github.com/JanSharp/VRCEditorTools/commit/b47025368bf9ca516b8b96acb931512cc3e29bf3))
+
 ## [1.3.7] - 2025-07-05
 
 ### Added
@@ -184,6 +190,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.8]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.8
 [1.3.7]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.7
 [1.3.6]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.6
 [1.3.5]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.5
