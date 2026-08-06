@@ -249,17 +249,23 @@ namespace JanSharp
             HashSet<Object> incomingRefs = new HashSet<Object>();
             HashSet<Object> outgoingRefs = new HashSet<Object>();
 
+            foreach (GameObject gameObject in gameObjects)
+                if (refsIncomingToObjects.TryGetValue(gameObject, out List<Component> refs))
+                    foreach (Component reference in refs)
+                        if (!innerObjectsLut.Contains(reference) && !incomingRefs.Contains(reference))
+                            incomingRefs.Add(reference);
+
             foreach (Component component in components)
             {
                 if (refsIncomingToComponents.TryGetValue(component, out List<Component> refs))
-                    foreach (Component comp in refs)
-                        if (!innerObjectsLut.Contains(comp) && !incomingRefs.Contains(comp))
-                            incomingRefs.Add(comp);
+                    foreach (Component reference in refs)
+                        if (!innerObjectsLut.Contains(reference) && !incomingRefs.Contains(reference))
+                            incomingRefs.Add(reference);
 
                 if (refsOutgoingFromComponents.TryGetValue(component, out List<Object> objs))
-                    foreach (Object obj in objs)
-                        if (!innerObjectsLut.Contains(obj) && !outgoingRefs.Contains(obj))
-                            outgoingRefs.Add(obj);
+                    foreach (Object reference in objs)
+                        if (!innerObjectsLut.Contains(reference) && !outgoingRefs.Contains(reference))
+                            outgoingRefs.Add(reference);
             }
 
             AddHeader("Incoming References");
