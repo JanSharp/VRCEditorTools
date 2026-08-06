@@ -57,9 +57,9 @@ namespace JanSharp
 
             AddCollectAllReferencesButton(scrollView);
             AddTotalRefsCountLabel(scrollView);
+            AddUpdateAndPingButtons(scrollView);
             AddAutoUpdateToggle(scrollView);
             AddIncludeChildrenToggle(scrollView);
-            AddUpdateAndPingButtons(scrollView);
             AddContainer(scrollView);
 
             root.Add(scrollView);
@@ -77,6 +77,7 @@ namespace JanSharp
         {
             totalRefsCountLabel = new Label(GetRefCountLabelText());
             totalRefsCountLabel.style.unityTextAlign = TextAnchor.UpperCenter;
+            totalRefsCountLabel.style.marginBottom = 4f;
             parent.Add(totalRefsCountLabel);
         }
 
