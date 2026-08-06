@@ -35,6 +35,10 @@ namespace JanSharp
         private Toggle autoUpdateToggle;
         private Toggle includeChildrenToggle;
         private Button updateButton;
+        private Button pingSelfButton;
+
+        private bool isShowingReferences = false;
+        private Object currentSelf = null;
 
         [MenuItem("Tools/JanSharp/References Window", priority = 500)]
         public static void ShowReferencesWindow()
@@ -75,9 +79,19 @@ namespace JanSharp
             });
             scrollView.Add(includeChildrenToggle);
 
-            updateButton = new Button(UpdateForSelected) { text = "Update" };
-            UpdateUpdateButton();
-            scrollView.Add(updateButton);
+            {
+                VisualElement horizontalButtons = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
+
+                updateButton = new Button(UpdateForSelected) { text = "Update", style = { flexGrow = 1f } };
+                UpdateUpdateButton();
+                horizontalButtons.Add(updateButton);
+
+                pingSelfButton = new Button(PingSelf) { text = "Ping Self", style = { flexGrow = 1f } };
+                UpdatePingSelfButton();
+                horizontalButtons.Add(pingSelfButton);
+
+                scrollView.Add(horizontalButtons);
+            }
 
             container = new VisualElement();
             container.style.marginTop = 4f;
@@ -97,16 +111,43 @@ namespace JanSharp
             updateButton.SetEnabled(!autoUpdateToggle.value);
         }
 
-        private void UpdateForSelected()
+        private void UpdatePingSelfButton()
+        {
+            pingSelfButton.SetEnabled(isShowingReferences);
+        }
+
+        private void SetIsShowingReferences(bool isShowing)
+        {
+            isShowingReferences = isShowing;
+            if (!isShowing)
+                currentSelf = null;
+            UpdatePingSelfButton();
+        }
+
+        private void PingSelf()
+        {
+            if (currentSelf != null) // Could have been destroyed.
+                EditorGUIUtility.PingObject(currentSelf);
+        }
+
+        private void ClearContainer()
         {
             container.Clear();
+            SetIsShowingReferences(false);
+        }
+
+        private void UpdateForSelected()
+        {
+            ClearContainer();
             Object selected = Selection.activeObject;
             if (selected == null)
                 return;
-            if (includeChildrenToggle.value && selected is GameObject go && !PrefabUtility.IsPartOfPrefabAsset(go))
+            currentSelf = selected;
+            SetIsShowingReferences(true);
+            if (includeChildrenToggle.value && currentSelf is GameObject go && !PrefabUtility.IsPartOfPrefabAsset(go))
                 UpdateContainerIncludingChildren(go);
             else
-                UpdateContainerForSingleObject(selected);
+                UpdateContainerForSingleObject(currentSelf);
         }
 
         private void AddFoldout<T>(bool isIncoming, List<T> referees, string referencedObjectName = null) where T : Object
