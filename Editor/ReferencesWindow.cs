@@ -80,7 +80,7 @@ namespace JanSharp
             scrollView.Add(updateButton);
 
             container = new VisualElement();
-            container.style.marginTop = 4;
+            container.style.marginTop = 4f;
             scrollView.Add(container);
 
             root.Add(scrollView);
@@ -112,13 +112,13 @@ namespace JanSharp
         private void AddFoldout<T>(bool isIncoming, List<T> referees, string referencedObjectName = null) where T : Object
         {
             Box box = new Box();
-            box.style.marginTop = 2;
+            box.style.marginTop = 2f;
 
             Foldout foldout = new Foldout();
             if (isIncoming)
-                foldout.text = $"Incoming refs{(referencedObjectName == null ? "" : $" from {referencedObjectName}")}: {referees.Count}";
+                foldout.text = $"Incoming references{(referencedObjectName == null ? "" : $" to {referencedObjectName}")}: {referees.Count}";
             else
-                foldout.text = $"Outgoing refs{(referencedObjectName == null ? "" : $" to {referencedObjectName}")}: {referees.Count}";
+                foldout.text = $"Outgoing references{(referencedObjectName == null ? "" : $" from {referencedObjectName}")}: {referees.Count}";
 
             foreach (Object referee in referees)
                 foldout.contentContainer.Add(new Button(() => { EditorGUIUtility.PingObject(referee); })
@@ -133,9 +133,27 @@ namespace JanSharp
         private void AddNoReferencesBox(string label)
         {
             Box box = new Box();
-            box.style.marginTop = 2;
-            box.Add(new Label(label));
+            box.style.marginTop = 2f;
+            box.style.paddingBottom = 2f;
+            box.style.paddingTop = 2f;
+            box.style.paddingLeft = 4f;
+            box.style.paddingRight = 4f;
+            box.Add(new Label(label) { style = { unityTextAlign = TextAnchor.MiddleCenter } });
             container.Add(box);
+        }
+
+        private void AddHeader(string label, bool extraTopMargin = false)
+        {
+            container.Add(new Label(label)
+            {
+                style =
+                {
+                    fontSize = 14f,
+                    unityFontStyleAndWeight = FontStyle.Bold,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                    marginTop = extraTopMargin ? 8f : 2f,
+                },
+            });
         }
 
         private void UpdateContainerIncludingChildren(GameObject parent)
@@ -162,11 +180,13 @@ namespace JanSharp
                             outgoingRefs.Add(obj);
             }
 
+            AddHeader("Incoming References");
             if (incomingRefs.Count == 0)
                 AddNoReferencesBox("No incoming references to selected and children");
             else
                 AddFoldout(isIncoming: true, incomingRefs.ToList());
 
+            AddHeader("Outgoing References", extraTopMargin: true);
             if (outgoingRefs.Count == 0)
                 AddNoReferencesBox("No outgoing references from selected and children");
             else
@@ -175,26 +195,38 @@ namespace JanSharp
 
         private void UpdateContainerForSingleObject(Object main)
         {
-            bool noReferences = true;
+            bool noIncomingReferences = true;
+            bool noOutgoingReferences = true;
 
             bool isGameObject = main is GameObject;
+            Component[] components = !isGameObject ? null : ((GameObject)main).GetComponents<Component>();
 
-            if (refsIncomingToObjects.TryGetValue(main, out List<Component> refs))
+            AddHeader("Incoming References");
+            if (refsIncomingToObjects.TryGetValue(main, out List<Component> incomingRefs))
             {
-                noReferences = false;
-                AddFoldout(isIncoming: true, refs, referencedObjectName: isGameObject ? "GameObject" : "Asset");
+                noIncomingReferences = false;
+                AddFoldout(isIncoming: true, incomingRefs, referencedObjectName: isGameObject ? "GameObject" : "Asset");
             }
-
             if (isGameObject)
-                foreach (Component component in ((GameObject)main).GetComponents<Component>())
-                    if (component != null && refsIncomingToComponents.TryGetValue(component, out refs))
+                foreach (Component component in components)
+                    if (component != null && refsIncomingToComponents.TryGetValue(component, out incomingRefs))
                     {
-                        noReferences = false;
-                        AddFoldout(isIncoming: true, refs, component.GetType().Name);
+                        noIncomingReferences = false;
+                        AddFoldout(isIncoming: true, incomingRefs, component.GetType().Name);
                     }
+            if (noIncomingReferences)
+                AddNoReferencesBox("No incoming references to selected");
 
-            if (noReferences)
-                AddNoReferencesBox("No incoming references to selected.");
+            AddHeader("Outgoing References", extraTopMargin: true);
+            if (isGameObject)
+                foreach (Component component in components)
+                    if (component != null && refsOutgoingFromComponents.TryGetValue(component, out List<Object> outgoingRefs))
+                    {
+                        noOutgoingReferences = false;
+                        AddFoldout(isIncoming: false, outgoingRefs, component.GetType().Name);
+                    }
+            if (noOutgoingReferences)
+                AddNoReferencesBox("No outgoing references from selected");
         }
 
         private string GetRefCountLabelText()
