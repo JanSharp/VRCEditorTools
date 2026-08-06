@@ -55,11 +55,14 @@ namespace JanSharp
             VisualElement root = this.rootVisualElement;
             ScrollView scrollView = new ScrollView();
 
-            AddCollectAllReferencesButton(scrollView);
-            AddTotalRefsCountLabel(scrollView);
-            AddUpdateAndPingButtons(scrollView);
-            AddAutoUpdateToggle(scrollView);
-            AddIncludeChildrenToggle(scrollView);
+            Box box = new Box();
+            AddCollectAllReferencesButton(box);
+            AddTotalRefsCountLabel(box);
+            AddUpdateAndPingButtons(box);
+            AddAutoUpdateToggle(box);
+            AddIncludeChildrenToggle(box);
+            scrollView.Add(box);
+
             AddContainer(scrollView);
 
             root.Add(scrollView);
