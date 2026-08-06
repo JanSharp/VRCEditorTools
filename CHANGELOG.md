@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.3.11] - 2026-08-06
+
+### Fixed
+
+- Fix References Window erroring when trying to show references to assets ([`31c7d6c`](https://github.com/JanSharp/VRCEditorTools/commit/31c7d6c476261d8190b86e234b4f71859b3d1cc6))
+
 ## [1.3.10] - 2026-08-06
 
 ### Changed
@@ -212,6 +218,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.11]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.11
 [1.3.10]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.10
 [1.3.9]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.9
 [1.3.8]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.8
