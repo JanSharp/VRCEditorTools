@@ -1,6 +1,22 @@
 
 # Changelog
 
+## [1.3.10] - 2026-08-06
+
+### Changed
+
+- Exclude self references when not using Include Children in References Window ([`d824cd0`](https://github.com/JanSharp/VRCEditorTools/commit/d824cd0e39dae3709ccb962140165c2502085662))
+- Show outgoing references when not using Include Children in References Window ([`9b3df83`](https://github.com/JanSharp/VRCEditorTools/commit/9b3df8328ce0ffbedca4d3c415c68f2bbf2836c7))
+- Rephrase and clarify the References Window ([`72f338d`](https://github.com/JanSharp/VRCEditorTools/commit/72f338dc5539462c9642489fc62238e71db0ec87), [`4f05441`](https://github.com/JanSharp/VRCEditorTools/commit/4f054417e331c1249b4b75ca55eddbcbff2b6bf9), [`60239a4`](https://github.com/JanSharp/VRCEditorTools/commit/60239a4a30692c834597958c134719850cb1c09d))
+
+### Added
+
+- Add Ping Self button to References Window pinging the object references are currently shown for ([`2636897`](https://github.com/JanSharp/VRCEditorTools/commit/2636897d0f078d87a36d4d56e58a0f6855ca79a0))
+
+### Fixed
+
+- Fix not including references to game objects when using Include Children in References Window ([`85eb34a`](https://github.com/JanSharp/VRCEditorTools/commit/85eb34a7671919c2f670a32e04519ca2c7707388))
+
 ## [1.3.9] - 2026-07-14
 
 ### Changed
@@ -196,6 +212,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.10]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.10
 [1.3.9]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.9
 [1.3.8]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.8
 [1.3.7]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.7
