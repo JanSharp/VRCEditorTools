@@ -30,7 +30,7 @@ namespace JanSharp
         Dictionary<Component, List<Object>> refsOutgoingFromComponents = new Dictionary<Component, List<Object>>();
         #endregion
 
-        private Label totalRefCountLabel;
+        private Label totalRefsCountLabel;
         private VisualElement container;
         private Toggle autoUpdateToggle;
         private Toggle includeChildrenToggle;
@@ -50,17 +50,38 @@ namespace JanSharp
 
         private void CreateGUI()
         {
-            ClearDataset();
+            ClearCollectedReferences();
 
             VisualElement root = this.rootVisualElement;
-
             ScrollView scrollView = new ScrollView();
 
-            scrollView.Add(new Button(RefreshDataset) { text = "Collect all references in active scene" });
-            totalRefCountLabel = new Label(GetRefCountLabelText());
-            totalRefCountLabel.style.unityTextAlign = TextAnchor.UpperCenter;
-            scrollView.Add(totalRefCountLabel);
+            AddCollectAllReferencesButton(scrollView);
+            AddTotalRefsCountLabel(scrollView);
+            AddAutoUpdateToggle(scrollView);
+            AddIncludeChildrenToggle(scrollView);
+            AddUpdateAndPingButtons(scrollView);
+            AddContainer(scrollView);
 
+            root.Add(scrollView);
+
+            UpdateUpdateButton();
+            UpdatePingSelfButton();
+        }
+
+        private void AddCollectAllReferencesButton(VisualElement parent)
+        {
+            parent.Add(new Button(CollectAllReferences) { text = "Collect all references in active scene" });
+        }
+
+        private void AddTotalRefsCountLabel(VisualElement parent)
+        {
+            totalRefsCountLabel = new Label(GetRefCountLabelText());
+            totalRefsCountLabel.style.unityTextAlign = TextAnchor.UpperCenter;
+            parent.Add(totalRefsCountLabel);
+        }
+
+        private void AddAutoUpdateToggle(VisualElement parent)
+        {
             autoUpdateToggle = new Toggle("Auto Update On Selection Change");
             autoUpdateToggle.value = true;
             autoUpdateToggle.RegisterValueChangedCallback(e =>
@@ -69,35 +90,38 @@ namespace JanSharp
                 if (e.newValue)
                     UpdateForSelected();
             });
-            scrollView.Add(autoUpdateToggle);
+            parent.Add(autoUpdateToggle);
+        }
 
+        private void AddIncludeChildrenToggle(VisualElement parent)
+        {
             includeChildrenToggle = new Toggle("Include References To/From Children");
             includeChildrenToggle.RegisterValueChangedCallback(value =>
             {
                 if (autoUpdateToggle.value)
                     UpdateForSelected();
             });
-            scrollView.Add(includeChildrenToggle);
+            parent.Add(includeChildrenToggle);
+        }
 
-            {
-                VisualElement horizontalButtons = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
+        private void AddUpdateAndPingButtons(VisualElement parent)
+        {
+            VisualElement horizontalButtons = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
 
-                updateButton = new Button(UpdateForSelected) { text = "Update For Selected", style = { flexGrow = 1f } };
-                UpdateUpdateButton();
-                horizontalButtons.Add(updateButton);
+            updateButton = new Button(UpdateForSelected) { text = "Update For Selected", style = { flexGrow = 1f } };
+            horizontalButtons.Add(updateButton);
 
-                pingSelfButton = new Button(PingSelf) { text = "Ping Self", style = { flexGrow = 1f } };
-                UpdatePingSelfButton();
-                horizontalButtons.Add(pingSelfButton);
+            pingSelfButton = new Button(PingSelf) { text = "Ping Self", style = { flexGrow = 1f } };
+            horizontalButtons.Add(pingSelfButton);
 
-                scrollView.Add(horizontalButtons);
-            }
+            parent.Add(horizontalButtons);
+        }
 
+        private void AddContainer(VisualElement parent)
+        {
             container = new VisualElement();
             container.style.marginTop = 4f;
-            scrollView.Add(container);
-
-            root.Add(scrollView);
+            parent.Add(container);
         }
 
         private void OnSelectionChange()
@@ -288,20 +312,20 @@ namespace JanSharp
             referees.Add(referee);
         }
 
-        private void ClearDataset()
+        private void ClearCollectedReferences()
         {
             refsIncomingToComponents.Clear();
             refsIncomingToObjects.Clear();
             totalComponentRefsCount = 0;
             totalOtherRefsCount = 0;
             refsOutgoingFromComponents.Clear();
-            if (totalRefCountLabel != null)
-                totalRefCountLabel.text = GetRefCountLabelText();
+            if (totalRefsCountLabel != null)
+                totalRefsCountLabel.text = GetRefCountLabelText();
         }
 
-        private void RefreshDataset()
+        private void CollectAllReferences()
         {
-            ClearDataset();
+            ClearCollectedReferences();
             List<Object> outgoingRefs = new List<Object>();
             foreach (Component referee in UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().GetRootGameObjects()
                 .SelectMany(go => go.GetComponentsInChildren<Component>(includeInactive: true))
@@ -346,7 +370,7 @@ namespace JanSharp
                 }
             }
 
-            totalRefCountLabel.text = GetRefCountLabelText();
+            totalRefsCountLabel.text = GetRefCountLabelText();
             if (autoUpdateToggle.value)
                 UpdateForSelected();
         }
