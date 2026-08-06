@@ -287,8 +287,15 @@ namespace JanSharp
             bool noOutgoingReferences = true;
 
             bool isGameObject = main is GameObject;
-            Component[] components = !isGameObject ? null : ((GameObject)main).GetComponents<Component>();
-            HashSet<Object> toExclude = components.Where(c => c != null).Cast<Object>().Append(main).ToHashSet();
+            Component[] components = null;
+            // Can just leave this null for assets, because the only references
+            // found to them are coming from the scene. No self refernce could be found.
+            HashSet<Object> toExclude = null;
+            if (isGameObject)
+            {
+                components = ((GameObject)main).GetComponents<Component>();
+                toExclude = components.Where(c => c != null).Cast<Object>().Append(main).ToHashSet();
+            }
 
             AddHeader("Incoming References");
             if (refsIncomingToObjects.TryGetValue(main, out List<Component> incomingRefs))
