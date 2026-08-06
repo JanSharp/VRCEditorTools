@@ -178,25 +178,35 @@ namespace JanSharp
                 UpdateContainerForSingleObject(currentSelf);
         }
 
-        private void AddFoldout<T>(bool isIncoming, List<T> referees, string referencedObjectName = null) where T : Object
+        private bool PotentiallyAddFoldout<T>(bool isIncoming, List<T> refs, string actingObjectName = null, HashSet<Object> refsToExclude = null) where T : Object
         {
             Box box = new Box();
             box.style.marginTop = 2f;
-
             Foldout foldout = new Foldout();
-            if (isIncoming)
-                foldout.text = $"Incoming references{(referencedObjectName == null ? "" : $" to {referencedObjectName}")}: {referees.Count}";
-            else
-                foldout.text = $"Outgoing references{(referencedObjectName == null ? "" : $" from {referencedObjectName}")}: {referees.Count}";
 
-            foreach (Object referee in referees)
-                foldout.contentContainer.Add(new Button(() => { EditorGUIUtility.PingObject(referee); })
+            int refsCount = 0;
+            foreach (T reference in refs)
+            {
+                if (refsToExclude != null && refsToExclude.Contains(reference))
+                    continue;
+                refsCount++;
+                foldout.contentContainer.Add(new Button(() => { EditorGUIUtility.PingObject(reference); })
                 {
-                    text = $"{referee.name} - {referee.GetType().Name}",
+                    text = $"{reference.name} - {reference.GetType().Name}",
                 });
+            }
+
+            if (refsCount == 0)
+                return false;
+
+            if (isIncoming)
+                foldout.text = $"Incoming references{(actingObjectName == null ? "" : $" to {actingObjectName}")}: {refsCount}";
+            else
+                foldout.text = $"Outgoing references{(actingObjectName == null ? "" : $" from {actingObjectName}")}: {refsCount}";
 
             box.Add(foldout);
             container.Add(box);
+            return true;
         }
 
         private void AddNoReferencesBox(string label)
@@ -253,13 +263,13 @@ namespace JanSharp
             if (incomingRefs.Count == 0)
                 AddNoReferencesBox("No incoming references to selected and children");
             else
-                AddFoldout(isIncoming: true, incomingRefs.ToList());
+                PotentiallyAddFoldout(isIncoming: true, incomingRefs.ToList());
 
             AddHeader("Outgoing References", extraTopMargin: true);
             if (outgoingRefs.Count == 0)
                 AddNoReferencesBox("No outgoing references from selected and children");
             else
-                AddFoldout(isIncoming: false, outgoingRefs.ToList());
+                PotentiallyAddFoldout(isIncoming: false, outgoingRefs.ToList());
         }
 
         private void UpdateContainerForSingleObject(Object main)
@@ -269,20 +279,17 @@ namespace JanSharp
 
             bool isGameObject = main is GameObject;
             Component[] components = !isGameObject ? null : ((GameObject)main).GetComponents<Component>();
+            HashSet<Object> toExclude = components.Where(c => c != null).Cast<Object>().Append(main).ToHashSet();
 
             AddHeader("Incoming References");
             if (refsIncomingToObjects.TryGetValue(main, out List<Component> incomingRefs))
-            {
-                noIncomingReferences = false;
-                AddFoldout(isIncoming: true, incomingRefs, referencedObjectName: isGameObject ? "GameObject" : "Asset");
-            }
+                if (PotentiallyAddFoldout(isIncoming: true, incomingRefs, actingObjectName: isGameObject ? "GameObject" : "Asset", toExclude))
+                    noIncomingReferences = false;
             if (isGameObject)
                 foreach (Component component in components)
                     if (component != null && refsIncomingToComponents.TryGetValue(component, out incomingRefs))
-                    {
-                        noIncomingReferences = false;
-                        AddFoldout(isIncoming: true, incomingRefs, component.GetType().Name);
-                    }
+                        if (PotentiallyAddFoldout(isIncoming: true, incomingRefs, component.GetType().Name, toExclude))
+                            noIncomingReferences = false;
             if (noIncomingReferences)
                 AddNoReferencesBox("No incoming references to selected");
 
@@ -290,10 +297,8 @@ namespace JanSharp
             if (isGameObject)
                 foreach (Component component in components)
                     if (component != null && refsOutgoingFromComponents.TryGetValue(component, out List<Object> outgoingRefs))
-                    {
-                        noOutgoingReferences = false;
-                        AddFoldout(isIncoming: false, outgoingRefs, component.GetType().Name);
-                    }
+                        if (PotentiallyAddFoldout(isIncoming: false, outgoingRefs, component.GetType().Name, toExclude))
+                            noOutgoingReferences = false;
             if (noOutgoingReferences)
                 AddNoReferencesBox("No outgoing references from selected");
         }
