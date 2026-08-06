@@ -37,6 +37,7 @@ namespace JanSharp
         private Button updateButton;
         private Button pingSelfButton;
 
+        private bool didCollectReferences = false;
         private bool isShowingReferences = false;
         private Object currentSelf = null;
 
@@ -136,7 +137,7 @@ namespace JanSharp
 
         private void UpdateUpdateButton()
         {
-            updateButton.SetEnabled(!autoUpdateToggle.value);
+            updateButton.SetEnabled(!autoUpdateToggle.value && didCollectReferences);
         }
 
         private void UpdatePingSelfButton()
@@ -166,6 +167,8 @@ namespace JanSharp
 
         private void UpdateForSelected()
         {
+            if (!didCollectReferences)
+                return;
             ClearContainer();
             Object selected = Selection.activeObject;
             if (selected == null)
@@ -303,9 +306,25 @@ namespace JanSharp
                 AddNoReferencesBox("No outgoing references from selected");
         }
 
+        private void SetDidCollectReferences(bool didCollect)
+        {
+            didCollectReferences = didCollect;
+            if (updateButton != null)
+                UpdateUpdateButton();
+            if (totalRefsCountLabel != null)
+                UpdateTotalRefsCountLabel();
+        }
+
+        private void UpdateTotalRefsCountLabel()
+        {
+            totalRefsCountLabel.text = GetRefCountLabelText();
+        }
+
         private string GetRefCountLabelText()
         {
-            return $"{totalComponentRefsCount} component refs, {totalOtherRefsCount} other refs";
+            return !didCollectReferences
+                ? "Press the Collect button"
+                : $"Collected {totalComponentRefsCount} component refs and {totalOtherRefsCount} other refs";
         }
 
         private void AddIncomingRef<T>(Dictionary<T, List<Component>> refs, T referenced, Component referee, ref int count)
@@ -328,8 +347,7 @@ namespace JanSharp
             totalComponentRefsCount = 0;
             totalOtherRefsCount = 0;
             refsOutgoingFromComponents.Clear();
-            if (totalRefsCountLabel != null)
-                totalRefsCountLabel.text = GetRefCountLabelText();
+            SetDidCollectReferences(false);
         }
 
         private void CollectAllReferences()
@@ -379,7 +397,7 @@ namespace JanSharp
                 }
             }
 
-            totalRefsCountLabel.text = GetRefCountLabelText();
+            SetDidCollectReferences(true);
             if (autoUpdateToggle.value)
                 UpdateForSelected();
         }
