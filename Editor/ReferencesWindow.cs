@@ -1,22 +1,36 @@
-using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace JanSharp
 {
     public class ReferencesWindow : EditorWindow
     {
-        // incoming
-        Dictionary<Component, List<Component>> componentRefs = new Dictionary<Component, List<Component>>();
-        Dictionary<Object, List<Component>> otherRefs = new Dictionary<Object, List<Component>>();
-        private int componentRefsCount = 0;
-        private int otherRefsCount = 0;
-        // outgoing
-        Dictionary<Component, List<Object>> outgoingObjectRefs = new Dictionary<Component, List<Object>>();
+        #region Incoming
+        /// <summary>
+        /// <para>Purely contains references coming from other components in the scene.</para>
+        /// </summary>
+        Dictionary<Component, List<Component>> refsIncomingToComponents = new Dictionary<Component, List<Component>>();
+        /// <summary>
+        /// <para>Contains references to game objects in the scene coming from other components in the scene.</para>
+        /// <para>Also contains keys which are assets that are references by components in the scene.</para>
+        /// </summary>
+        Dictionary<Object, List<Component>> refsIncomingToObjects = new Dictionary<Object, List<Component>>();
+        private int totalComponentRefsCount = 0;
+        private int totalOtherRefsCount = 0;
+        #endregion
 
-        private Label refCountLabel;
+        #region Outgoing
+        /// <summary>
+        /// <para>Only contains references from components in the scene to any other components or game
+        /// objects also in the scene. No references to assets.</para>
+        /// </summary>
+        Dictionary<Component, List<Object>> refsOutgoingFromComponents = new Dictionary<Component, List<Object>>();
+        #endregion
+
+        private Label totalRefCountLabel;
         private VisualElement container;
         private Toggle autoUpdateToggle;
         private Toggle includeChildrenToggle;
@@ -39,9 +53,9 @@ namespace JanSharp
             ScrollView scrollView = new ScrollView();
 
             scrollView.Add(new Button(RefreshDataset) { text = "Refresh Dataset" });
-            refCountLabel = new Label(GetRefCountLabelText());
-            refCountLabel.style.unityTextAlign = TextAnchor.UpperCenter;
-            scrollView.Add(refCountLabel);
+            totalRefCountLabel = new Label(GetRefCountLabelText());
+            totalRefCountLabel.style.unityTextAlign = TextAnchor.UpperCenter;
+            scrollView.Add(totalRefCountLabel);
 
             autoUpdateToggle = new Toggle("Auto Update");
             autoUpdateToggle.value = true;
@@ -95,15 +109,23 @@ namespace JanSharp
                 UpdateContainerForSingleObject(selected);
         }
 
-        private void AddFoldout<T>(string name, List<T> referees) where T : Object
+        private void AddFoldout<T>(bool isIncoming, List<T> referees, string referencedObjectName = null) where T : Object
         {
             Box box = new Box();
             box.style.marginTop = 2;
+
             Foldout foldout = new Foldout();
-            foldout.text = $"{name} refs: {referees.Count}";
+            if (isIncoming)
+                foldout.text = $"Incoming refs{(referencedObjectName == null ? "" : $" from {referencedObjectName}")}: {referees.Count}";
+            else
+                foldout.text = $"Outgoing refs{(referencedObjectName == null ? "" : $" to {referencedObjectName}")}: {referees.Count}";
+
             foreach (Object referee in referees)
                 foldout.contentContainer.Add(new Button(() => { EditorGUIUtility.PingObject(referee); })
-                    { text = $"{referee.name} - {referee.GetType().Name}" });
+                {
+                    text = $"{referee.name} - {referee.GetType().Name}",
+                });
+
             box.Add(foldout);
             container.Add(box);
         }
@@ -129,12 +151,12 @@ namespace JanSharp
 
             foreach (Component component in components)
             {
-                if (componentRefs.TryGetValue(component, out List<Component> refs))
+                if (refsIncomingToComponents.TryGetValue(component, out List<Component> refs))
                     foreach (Component comp in refs)
                         if (!innerObjectsLut.Contains(comp) && !incomingRefs.Contains(comp))
                             incomingRefs.Add(comp);
 
-                if (outgoingObjectRefs.TryGetValue(component, out List<Object> objs))
+                if (refsOutgoingFromComponents.TryGetValue(component, out List<Object> objs))
                     foreach (Object obj in objs)
                         if (!innerObjectsLut.Contains(obj) && !outgoingRefs.Contains(obj))
                             outgoingRefs.Add(obj);
@@ -143,12 +165,12 @@ namespace JanSharp
             if (incomingRefs.Count == 0)
                 AddNoReferencesBox("No incoming references to selected and children");
             else
-                AddFoldout("Incoming", incomingRefs.ToList());
+                AddFoldout(isIncoming: true, incomingRefs.ToList());
 
             if (outgoingRefs.Count == 0)
                 AddNoReferencesBox("No outgoing references from selected and children");
             else
-                AddFoldout("Outgoing", outgoingRefs.ToList());
+                AddFoldout(isIncoming: false, outgoingRefs.ToList());
         }
 
         private void UpdateContainerForSingleObject(Object main)
@@ -157,30 +179,30 @@ namespace JanSharp
 
             bool isGameObject = main is GameObject;
 
-            if (otherRefs.TryGetValue(main, out List<Component> refs))
+            if (refsIncomingToObjects.TryGetValue(main, out List<Component> refs))
             {
                 noReferences = false;
-                AddFoldout(isGameObject ? "GameObject" : "Asset", refs);
+                AddFoldout(isIncoming: true, refs, referencedObjectName: isGameObject ? "GameObject" : "Asset");
             }
 
             if (isGameObject)
                 foreach (Component component in ((GameObject)main).GetComponents<Component>())
-                    if (component != null && componentRefs.TryGetValue(component, out refs))
+                    if (component != null && refsIncomingToComponents.TryGetValue(component, out refs))
                     {
                         noReferences = false;
-                        AddFoldout(component.GetType().Name, refs);
+                        AddFoldout(isIncoming: true, refs, component.GetType().Name);
                     }
 
             if (noReferences)
-                AddNoReferencesBox("No references to selected.");
+                AddNoReferencesBox("No incoming references to selected.");
         }
 
         private string GetRefCountLabelText()
         {
-            return $"{componentRefsCount} component refs, {otherRefsCount} other refs";
+            return $"{totalComponentRefsCount} component refs, {totalOtherRefsCount} other refs";
         }
 
-        private void AddRef<T>(Dictionary<T, List<Component>> refs, T referenced, Component referee, ref int count)
+        private void AddIncomingRef<T>(Dictionary<T, List<Component>> refs, T referenced, Component referee, ref int count)
         {
             if (!refs.TryGetValue(referenced, out List<Component> referees))
             {
@@ -195,13 +217,13 @@ namespace JanSharp
 
         private void ClearDataset()
         {
-            componentRefs.Clear();
-            otherRefs.Clear();
-            componentRefsCount = 0;
-            otherRefsCount = 0;
-            outgoingObjectRefs.Clear();
-            if (refCountLabel != null)
-                refCountLabel.text = GetRefCountLabelText();
+            refsIncomingToComponents.Clear();
+            refsIncomingToObjects.Clear();
+            totalComponentRefsCount = 0;
+            totalOtherRefsCount = 0;
+            refsOutgoingFromComponents.Clear();
+            if (totalRefCountLabel != null)
+                totalRefCountLabel.text = GetRefCountLabelText();
         }
 
         private void RefreshDataset()
@@ -217,7 +239,7 @@ namespace JanSharp
                 GameObject refereeGameObject = referee.gameObject;
                 SerializedObject proxy = new SerializedObject(referee);
                 SerializedProperty iter = proxy.GetIterator();
-                if (!iter.Next(true))
+                if (!iter.Next(enterChildren: true))
                     continue;
                 do
                 {
@@ -228,14 +250,14 @@ namespace JanSharp
                         continue;
                     if (referencedObject is Component referencedComponent)
                     {
-                        AddRef(componentRefs, referencedComponent, referee, ref componentRefsCount);
+                        AddIncomingRef(refsIncomingToComponents, referencedComponent, referee, ref totalComponentRefsCount);
                         // Prefab asset references are currently not needed, so just filter them out right away.
                         if (!PrefabUtility.IsPartOfPrefabAsset(referencedObject))
                             outgoingRefs.Add(referencedObject);
                     }
                     else
                     {
-                        AddRef(otherRefs, referencedObject, referee, ref otherRefsCount);
+                        AddIncomingRef(refsIncomingToObjects, referencedObject, referee, ref totalOtherRefsCount);
                         // Prefab asset references are currently not needed, so just filter them out right away.
                         // Same for non game object asset references.
                         if (referencedObject is GameObject && !PrefabUtility.IsPartOfPrefabAsset(referencedObject))
@@ -246,12 +268,12 @@ namespace JanSharp
 
                 if (outgoingRefs.Count != 0)
                 {
-                    outgoingObjectRefs.Add(referee, new List<Object>(outgoingRefs));
+                    refsOutgoingFromComponents.Add(referee, new List<Object>(outgoingRefs));
                     outgoingRefs.Clear();
                 }
             }
 
-            refCountLabel.text = GetRefCountLabelText();
+            totalRefCountLabel.text = GetRefCountLabelText();
             if (autoUpdateToggle.value)
                 UpdateForSelected();
         }
