@@ -56,12 +56,12 @@ namespace JanSharp
 
             ScrollView scrollView = new ScrollView();
 
-            scrollView.Add(new Button(RefreshDataset) { text = "Refresh Dataset" });
+            scrollView.Add(new Button(RefreshDataset) { text = "Collect all references in active scene" });
             totalRefCountLabel = new Label(GetRefCountLabelText());
             totalRefCountLabel.style.unityTextAlign = TextAnchor.UpperCenter;
             scrollView.Add(totalRefCountLabel);
 
-            autoUpdateToggle = new Toggle("Auto Update");
+            autoUpdateToggle = new Toggle("Auto Update On Selection Change");
             autoUpdateToggle.value = true;
             autoUpdateToggle.RegisterValueChangedCallback(e =>
             {
@@ -71,7 +71,7 @@ namespace JanSharp
             });
             scrollView.Add(autoUpdateToggle);
 
-            includeChildrenToggle = new Toggle("Include Children");
+            includeChildrenToggle = new Toggle("Include References To/From Children");
             includeChildrenToggle.RegisterValueChangedCallback(value =>
             {
                 if (autoUpdateToggle.value)
@@ -82,7 +82,7 @@ namespace JanSharp
             {
                 VisualElement horizontalButtons = new VisualElement() { style = { flexDirection = FlexDirection.Row } };
 
-                updateButton = new Button(UpdateForSelected) { text = "Update", style = { flexGrow = 1f } };
+                updateButton = new Button(UpdateForSelected) { text = "Update For Selected", style = { flexGrow = 1f } };
                 UpdateUpdateButton();
                 horizontalButtons.Add(updateButton);
 
