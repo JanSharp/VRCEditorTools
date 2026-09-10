@@ -1,6 +1,6 @@
-using UnityEngine;
-using UnityEditor;
 using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEngine;
 
 namespace JanSharp
 {
@@ -9,7 +9,7 @@ namespace JanSharp
         private GameObject prefab;
         [SerializeField] private bool keepOriginalCountPostfix = true;
         [SerializeField] private bool keepOriginalName = false;
-        private bool foldout = false;
+        private static bool advancedFoldedOut = false;
         [SerializeField] private Vector3 localPositionOffset;
         [SerializeField] private Vector3 localRotationOffset;
         [SerializeField] private float localScaleMultiplier = 1f;
@@ -41,8 +41,7 @@ namespace JanSharp
                 new GUIContent("Keep Original (#) Postfix", "When true then the last (#) in the name of replaced objects will remain untouched."));
             EditorGUILayout.PropertyField(proxy.FindProperty(nameof(keepOriginalName)),
                 new GUIContent("Keep Original Name", "When true then the name - so the part before the (#) - of the replaced objects will remain untouched."));
-            foldout = EditorGUILayout.Foldout(foldout, new GUIContent("Advanced"));
-            if (foldout)
+            if (advancedFoldedOut = EditorGUILayout.Foldout(advancedFoldedOut, "Advanced", toggleOnLabelClick: true))
             {
                 EditorGUILayout.LabelField("The following all get applied in order:");
                 EditorGUILayout.Separator();
