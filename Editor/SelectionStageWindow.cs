@@ -365,13 +365,14 @@ namespace JanSharp
             if (!inverted && !toRemove.Any())
                 return false;
             BeginUndoAbleOperation("Removed from Selection Stage");
+            HashSet<Object> toRemoveLut = toRemove.ToHashSet();
             HashSet<Object> selectedObjects = RememberStageSelection();
             int c = staged.Count;
             int newI = 0;
             for (int i = 0; i < c; i++)
             {
                 Object go = staged[i];
-                if (toRemove.Contains(go) != inverted)
+                if (toRemoveLut.Contains(go) != inverted)
                     StagedLut.Remove(go);
                 else
                     staged[newI++] = go;
