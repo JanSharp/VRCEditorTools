@@ -200,7 +200,11 @@ namespace JanSharp
             foldout.Add(new Button(() =>
             {
                 if (!Directory.Exists(folderPathField.text))
+                {
+                    Debug.LogError($"No such directory '{folderPathField.text}'. Make sure it is a "
+                        + "full path relative to the root of the project, like Assets/Foo/Bar.");
                     return;
+                }
 
                 Dictionary<MeshAndMaterials, List<PrefabToReplaceWith>> meshesToPrefabsLut = new();
 
