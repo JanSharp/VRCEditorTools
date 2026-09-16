@@ -1,6 +1,20 @@
 
 # Changelog
 
+## [1.3.12] - 2026-09-16
+
+### Changed
+
+- Make bulk replace window foldout remember its open state throughout the lifetime of a unity session ([`900c883`](https://github.com/JanSharp/VRCEditorTools/commit/900c88392a6cd91de9c8601cfe349b9b0aa83790))
+
+### Added
+
+- Add very specific replacing of meshes with prefabs ([`bd9417a`](https://github.com/JanSharp/VRCEditorTools/commit/bd9417af493880f674cddbb3174fa60137ecd919))
+
+### Fixed
+
+- Fix Selection Stage removal of objects being O(n^2), scaling quadratically with the amount of objects being removed ([`9f9ce76`](https://github.com/JanSharp/VRCEditorTools/commit/9f9ce766581245f99f7d638e9e74e9b96c3709b6))
+
 ## [1.3.11] - 2026-08-06
 
 ### Fixed
@@ -218,6 +232,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.12]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.12
 [1.3.11]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.11
 [1.3.10]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.10
 [1.3.9]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.9
