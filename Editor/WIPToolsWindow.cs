@@ -172,12 +172,17 @@ namespace JanSharp
             Foldout foldout = new Foldout() { text = "Replace Meshes With Prefabs From Folder", value = false };
 
             foldout.Add(
-                new Label("Builds a lookup table from all meshes and their associated materials for "
+                new Label("- Builds a lookup table from all meshes and their associated materials for "
                     + "each given prefab in the given folder recursively.\n"
-                    + "Then goes through all mesh filters in the scene, checks if they are not part of a prefab instance, "
+                    + "- Then goes through all mesh filters in the scene, checks if they are not part of a prefab instance, "
                     + "and if their mesh plus associated materials exists in one of the given prefabs, "
                     + "that object in the scene will get replaced with the prefab.\n"
-                    + "It makes sure to walk up in the hierarchy, which is to say the mesh filters can be children within each prefab.")
+                    + "- It makes sure to walk up in the hierarchy, which is to say the "
+                    + "mesh filters can be children within each prefab.\n"
+                    + "- It compares if the mesh filters and associated materials in the hierarchy to replace match "
+                    + "that of the prefab before replacing.\n"
+                    + "- In the case of multiple prefabs potentially matching a given mesh filter, "
+                    + "it tries the larger prefabs first (larger meaning more depth).")
                 { style = { whiteSpace = WhiteSpace.Normal } });
 
             TextField folderPathField = new TextField("Folder with Prefabs")
@@ -197,8 +202,7 @@ namespace JanSharp
                 if (!Directory.Exists(folderPathField.text))
                     return;
 
-                Dictionary<MeshAndMaterials, (GameObject prefab, int hierarchyDepth)> meshesToPrefabsLut = new();
-                HashSet<MeshAndMaterials> reusedMeshes = new();
+                Dictionary<MeshAndMaterials, List<PrefabToReplaceWith>> meshesToPrefabsLut = new();
 
                 int GetHierarchyDepth(Transform t)
                 {
@@ -211,20 +215,27 @@ namespace JanSharp
                     return depth;
                 }
 
+                void InsertSort<T>(List<T> list, T entry, System.Func<T, T, bool> leftSortsFirst)
+                {
+                    int insertIndex = 0;
+                    while (insertIndex < list.Count && leftSortsFirst(list[insertIndex], entry))
+                        insertIndex++;
+                    list.Insert(insertIndex, entry);
+                }
+
                 void RegisterMesh(MeshFilter meshFilter, GameObject prefab)
                 {
                     Mesh mesh = meshFilter.sharedMesh;
                     if (mesh == null)
                         return;
                     MeshAndMaterials key = new(meshFilter);
-                    if (reusedMeshes.Contains(key))
-                        return;
-                    if (meshesToPrefabsLut.Remove(key))
+                    if (!meshesToPrefabsLut.TryGetValue(key, out var registered))
                     {
-                        reusedMeshes.Add(key);
-                        return;
+                        registered = new();
+                        meshesToPrefabsLut.Add(key, registered);
                     }
-                    meshesToPrefabsLut.Add(key, (prefab, GetHierarchyDepth(meshFilter.transform)));
+                    PrefabToReplaceWith toReplaceWith = new(prefab, GetHierarchyDepth(meshFilter.transform));
+                    InsertSort(registered, toReplaceWith, (left, right) => left.hierarchyDepth > right.hierarchyDepth);
                 }
 
                 // Build the lookup table.
@@ -248,11 +259,6 @@ namespace JanSharp
                     }
                 }
                 WalkDirectory(folderPathField.text);
-
-                foreach (var registered in meshesToPrefabsLut.Values)
-                    allPrefabs.Remove(registered.prefab);
-                foreach (GameObject prefab in allPrefabs)
-                    Debug.LogWarning($"Cannot uniquely identify the prefab {prefab.name} - {AssetDatabase.GetAssetPath(prefab)}", prefab);
 
                 // Go through the scene.
 
@@ -321,15 +327,19 @@ namespace JanSharp
                     if (meshFilter == null // Objects get deleted (replaced) during the loop.
                         || meshFilter.sharedMesh == null
                         || PrefabUtility.IsPartOfPrefabInstance(meshFilter)
-                        || !meshesToPrefabsLut.TryGetValue(new MeshAndMaterials(meshFilter), out (GameObject prefab, int hierarchyDepth) toReplaceWith))
+                        || !meshesToPrefabsLut.TryGetValue(new MeshAndMaterials(meshFilter), out List<PrefabToReplaceWith> potentialPrefabs))
                     {
                         continue;
                     }
-                    Transform rootToReplace = GetNthParent(meshFilter.transform, toReplaceWith.hierarchyDepth);
-                    if (rootToReplace == null || !DeepCompareTransforms(rootToReplace, toReplaceWith.prefab.transform))
-                        continue;
-                    if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab))
-                        replacedCount++;
+                    foreach (PrefabToReplaceWith toReplaceWith in potentialPrefabs)
+                    {
+                        Transform rootToReplace = GetNthParent(meshFilter.transform, toReplaceWith.hierarchyDepth);
+                        if (rootToReplace == null || !DeepCompareTransforms(rootToReplace, toReplaceWith.prefab.transform))
+                            continue;
+                        if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab))
+                            replacedCount++;
+                        break;
+                    }
                 }
 
                 Debug.Log($"Replaced {replacedCount} objects with prefabs.");
@@ -349,6 +359,18 @@ namespace JanSharp
                 if (!left[i].Equals(right[i]))
                     return false;
             return true;
+        }
+
+        private readonly struct PrefabToReplaceWith
+        {
+            public readonly GameObject prefab;
+            public readonly int hierarchyDepth;
+
+            public PrefabToReplaceWith(GameObject prefab, int hierarchyDepth)
+            {
+                this.prefab = prefab;
+                this.hierarchyDepth = hierarchyDepth;
+            }
         }
 
         private readonly struct MeshAndMaterials : System.IEquatable<MeshAndMaterials>
