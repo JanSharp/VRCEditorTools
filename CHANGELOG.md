@@ -1,6 +1,20 @@
 
 # Changelog
 
+## [1.3.14] - 2026-09-16
+
+### Changed
+
+- Move mass replace info into its own foldout ([`1a58c01`](https://github.com/JanSharp/VRCEditorTools/commit/1a58c01872596229d9828b5881c8d0499af1fc84))
+- Make mass replacement try multiple prefabs ([`3f17235`](https://github.com/JanSharp/VRCEditorTools/commit/3f17235d650e2d0f3ff38ad584bd524b657f5ee9))
+- Compare meshes and materials in hierarchy structure before mass replacing ([`21c41ac`](https://github.com/JanSharp/VRCEditorTools/commit/21c41ac2db10b295d55d315f7199a20b8aef9898))
+- Make mass replacement check meshes and associated materials ([`628d690`](https://github.com/JanSharp/VRCEditorTools/commit/628d6905c9b69d42db8997fe804b7e219a6a72c5))
+- Make mass replacement find prefabs recursively ([`4d4293b`](https://github.com/JanSharp/VRCEditorTools/commit/4d4293b4db4c5bc6a7ec49c8e140597fc54523a9))
+
+### Added
+
+- Add error log when prefab folder cannot be found ([`35da543`](https://github.com/JanSharp/VRCEditorTools/commit/35da543e3199aadc5c188ac53533df8666d720f5))
+
 ## [1.3.13] - 2026-09-16
 
 ### Changed
@@ -239,6 +253,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.14]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.14
 [1.3.13]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.13
 [1.3.12]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.12
 [1.3.11]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.11
