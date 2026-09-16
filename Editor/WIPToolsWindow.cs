@@ -166,6 +166,136 @@ namespace JanSharp
             root.Add(box);
         }
 
+        private void CreateReplaceMeshesWithPrefabsFromFolderGUI()
+        {
+            Box box = new Box();
+            Foldout foldout = new Foldout() { text = "Replace Meshes With Prefabs From Folder", value = false };
+
+            foldout.Add(
+                new Label("Builds a lookup table from all meshes used by mesh filters for each given prefab in the given folder.\n"
+                    + "Then goes through all mesh filters in the scene, checks if they are not a prefab instance, and if the "
+                    + "mesh they are using exists in one of the given prefabs, that object in the scene will get replaced with "
+                    + "the prefab.\n"
+                    + "It makes sure to walk up in the hierarchy, which is to say the mesh filters can be children within each prefab.")
+                { style = { whiteSpace = WhiteSpace.Normal } });
+
+            TextField folderPathField = new TextField("Folder with Prefabs");
+            Toggle keepOriginalNameToggle = new Toggle("Keep Original Name");
+            Toggle keepOriginalCountPostfixToggle = new Toggle("Keep Original Count Prefix") { value = true };
+            foldout.Add(folderPathField);
+            foldout.Add(keepOriginalNameToggle);
+            foldout.Add(keepOriginalCountPostfixToggle);
+
+            foldout.Add(new Button(() =>
+            {
+                if (!Directory.Exists(folderPathField.text))
+                    return;
+
+                Dictionary<Mesh, (GameObject prefab, int hierarchyDepth)> meshesToPrefabs = new();
+                HashSet<Mesh> reusedMeshes = new();
+
+                int GetHierarchyDepth(Transform t)
+                {
+                    int depth = 0;
+                    while (t.parent != null)
+                    {
+                        depth++;
+                        t = t.parent;
+                    }
+                    return depth;
+                }
+
+                void LogWarningForReusedMesh(Mesh mesh, GameObject prefab)
+                {
+                    Debug.LogWarning($"Ignoring mesh {AssetDatabase.GetAssetPath(mesh)}, used by multiple prefabs "
+                        + $"- prefab: {AssetDatabase.GetAssetPath(prefab)}", prefab);
+                }
+
+                void RegisterMesh(MeshFilter meshFilter, GameObject prefab)
+                {
+                    Mesh mesh = meshFilter.sharedMesh;
+                    if (mesh == null)
+                        return;
+                    if (reusedMeshes.Contains(mesh))
+                    {
+                        LogWarningForReusedMesh(mesh, prefab);
+                        return;
+                    }
+                    if (meshesToPrefabs.ContainsKey(mesh))
+                    {
+                        LogWarningForReusedMesh(mesh, meshesToPrefabs[mesh].prefab);
+                        LogWarningForReusedMesh(mesh, prefab);
+                        meshesToPrefabs.Remove(mesh);
+                        reusedMeshes.Add(mesh);
+                        return;
+                    }
+                    meshesToPrefabs.Add(mesh, (prefab, GetHierarchyDepth(meshFilter.transform)));
+                }
+
+                // Build the lookup table.
+
+                foreach (string filePath in Directory.EnumerateFiles(folderPathField.text))
+                {
+                    if (Path.GetExtension(filePath) != ".prefab")
+                        continue;
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filePath);
+                    foreach (MeshFilter meshFilter in prefab.GetComponentsInChildren<MeshFilter>(includeInactive: true))
+                        RegisterMesh(meshFilter, prefab);
+                }
+
+                // Go through the scene.
+
+                bool TryReplace(GameObject toReplace, GameObject prefab)
+                {
+                    GameObject to = (GameObject)PrefabUtility.InstantiatePrefab(prefab, toReplace.transform.parent);
+                    if (to == null)
+                        return false;
+                    Undo.RegisterCreatedObjectUndo(to, $"replace object with '{prefab.name}'");
+                    to.transform.SetSiblingIndex(toReplace.transform.GetSiblingIndex());
+                    BulkReplaceWindow.ChangeName(toReplace, to, keepOriginalNameToggle.value, keepOriginalCountPostfixToggle.value);
+                    to.transform.localPosition = toReplace.transform.localPosition;
+                    to.transform.localRotation = toReplace.transform.localRotation;
+                    to.transform.localScale = toReplace.transform.localScale;
+                    Undo.DestroyObjectImmediate(toReplace);
+                    return true;
+                }
+
+                Transform GetNthParent(Transform t, int depth)
+                {
+                    for (int i = 0; i < depth; i++)
+                    {
+                        t = t.parent;
+                        if (t == null)
+                            return null;
+                    }
+                    return t;
+                }
+
+                int replacedCount = 0;
+
+                foreach (MeshFilter meshFilter in FindObjectsByType<MeshFilter>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                {
+                    if (meshFilter == null // Objects get deleted (replaced) during the loop.
+                        || meshFilter.sharedMesh == null
+                        || PrefabUtility.IsPartOfPrefabInstance(meshFilter)
+                        || !meshesToPrefabs.TryGetValue(meshFilter.sharedMesh, out (GameObject prefab, int hierarchyDepth) toReplaceWith))
+                    {
+                        continue;
+                    }
+                    Transform rootToReplace = GetNthParent(meshFilter.transform, toReplaceWith.hierarchyDepth);
+                    if (rootToReplace == null)
+                        continue;
+                    if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab))
+                        replacedCount++;
+                }
+
+                Debug.Log($"Replaced {replacedCount} objects with prefabs.");
+            })
+            { text = "Replace" });
+            box.Add(foldout);
+            root.Add(box);
+        }
+
         private void AddVerticalSpacer(VisualElement parent)
         {
             parent.Add(new VisualElement() { style = { height = 4 } });
@@ -179,6 +309,8 @@ namespace JanSharp
             CreateFindMaterialsUsingATextureGUI();
             AddVerticalSpacer(root);
             CreateGenerateHiddenChangesConfGUI();
+            AddVerticalSpacer(root);
+            CreateReplaceMeshesWithPrefabsFromFolderGUI();
             rootVisualElement.Add(root);
         }
     }

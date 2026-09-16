@@ -90,7 +90,7 @@ namespace JanSharp
                     continue;
                 Undo.RegisterCreatedObjectUndo(to, $"replace object with '{prefab.name}'");
                 to.transform.SetSiblingIndex(from.transform.GetSiblingIndex());
-                ChangeName(from, to);
+                ChangeName(from, to, keepOriginalName, keepOriginalCountPostfix);
                 to.transform.localPosition = from.transform.localPosition + localPositionOffset;
                 to.transform.localRotation = from.transform.localRotation * actualLocalRotationOffset;
                 to.transform.localScale = from.transform.localScale * localScaleMultiplier;
@@ -109,7 +109,7 @@ namespace JanSharp
         }
 
         private static Regex countPostfixRegex = new Regex(@" \(\d+\)$", RegexOptions.RightToLeft | RegexOptions.Compiled);
-        private void ChangeName(GameObject from, GameObject to)
+        public static void ChangeName(GameObject from, GameObject to, bool keepOriginalName, bool keepOriginalCountPostfix)
         {
             if (!keepOriginalName && !keepOriginalCountPostfix)
                 return;
