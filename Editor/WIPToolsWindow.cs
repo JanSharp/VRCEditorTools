@@ -185,9 +185,11 @@ namespace JanSharp
             };
             Toggle keepOriginalCountPostfixToggle = new Toggle("Keep Original (#) Postfix") { value = true };
             Toggle keepOriginalNameToggle = new Toggle("Keep Original Name");
+            Toggle recordUndoToggle = new Toggle("Record Undo") { value = true };
             foldout.Add(folderPathField);
             foldout.Add(keepOriginalCountPostfixToggle);
             foldout.Add(keepOriginalNameToggle);
+            foldout.Add(recordUndoToggle);
 
             foldout.Add(new Button(() =>
             {
@@ -248,18 +250,22 @@ namespace JanSharp
 
                 // Go through the scene.
 
-                bool TryReplace(GameObject toReplace, GameObject prefab)
+                bool TryReplace(GameObject toReplace, GameObject prefab, bool recordUndo)
                 {
                     GameObject to = (GameObject)PrefabUtility.InstantiatePrefab(prefab, toReplace.transform.parent);
                     if (to == null)
                         return false;
-                    Undo.RegisterCreatedObjectUndo(to, $"replace object with '{prefab.name}'");
+                    if (recordUndo)
+                        Undo.RegisterCreatedObjectUndo(to, $"replace object with '{prefab.name}'");
                     to.transform.SetSiblingIndex(toReplace.transform.GetSiblingIndex());
                     BulkReplaceWindow.ChangeName(toReplace, to, keepOriginalNameToggle.value, keepOriginalCountPostfixToggle.value);
                     to.transform.localPosition = toReplace.transform.localPosition;
                     to.transform.localRotation = toReplace.transform.localRotation;
                     to.transform.localScale = toReplace.transform.localScale;
-                    Undo.DestroyObjectImmediate(toReplace);
+                    if (recordUndo)
+                        Undo.DestroyObjectImmediate(toReplace);
+                    else
+                        DestroyImmediate(toReplace);
                     return true;
                 }
 
@@ -288,7 +294,7 @@ namespace JanSharp
                     Transform rootToReplace = GetNthParent(meshFilter.transform, toReplaceWith.hierarchyDepth);
                     if (rootToReplace == null)
                         continue;
-                    if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab))
+                    if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab, recordUndoToggle.value))
                         replacedCount++;
                 }
 
