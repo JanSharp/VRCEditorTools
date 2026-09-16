@@ -286,6 +286,34 @@ namespace JanSharp
                     return t;
                 }
 
+                bool CompareMeshFilters(MeshFilter left, MeshFilter right)
+                {
+                    if (left == null)
+                        return right == null;
+                    return left.sharedMesh == right.sharedMesh;
+                }
+
+                bool CompareRenderers(Renderer left, Renderer right)
+                {
+                    if (left == null)
+                        return right == null;
+                    return DeepCompareArrays(left.sharedMaterials, right.sharedMaterials);
+                }
+
+                bool DeepCompareTransforms(Transform left, Transform right)
+                {
+                    if (left.childCount != right.childCount)
+                        return false;
+                    if (!CompareMeshFilters(left.GetComponent<MeshFilter>(), right.GetComponent<MeshFilter>()))
+                        return false;
+                    if (!CompareRenderers(left.GetComponent<Renderer>(), right.GetComponent<Renderer>()))
+                        return false;
+                    for (int i = 0; i < left.childCount; i++)
+                        if (!DeepCompareTransforms(left.GetChild(i), right.GetChild(i)))
+                            return false;
+                    return true;
+                }
+
                 int replacedCount = 0;
 
                 foreach (MeshFilter meshFilter in FindObjectsByType<MeshFilter>(FindObjectsInactive.Include, FindObjectsSortMode.None))
@@ -298,7 +326,7 @@ namespace JanSharp
                         continue;
                     }
                     Transform rootToReplace = GetNthParent(meshFilter.transform, toReplaceWith.hierarchyDepth);
-                    if (rootToReplace == null)
+                    if (rootToReplace == null || !DeepCompareTransforms(rootToReplace, toReplaceWith.prefab.transform))
                         continue;
                     if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab))
                         replacedCount++;
@@ -309,6 +337,18 @@ namespace JanSharp
             { text = "Replace" });
             box.Add(foldout);
             root.Add(box);
+        }
+
+        private static bool DeepCompareArrays<T>(T[] left, T[] right)
+        {
+            if (left == null)
+                return right == null;
+            if (left.Length != right.Length)
+                return false;
+            for (int i = 0; i < left.Length; i++)
+                if (!left[i].Equals(right[i]))
+                    return false;
+            return true;
         }
 
         private readonly struct MeshAndMaterials : System.IEquatable<MeshAndMaterials>
@@ -330,12 +370,8 @@ namespace JanSharp
 
             public readonly bool Equals(MeshAndMaterials other)
             {
-                if (mesh != other.mesh || materials.Length != other.materials.Length)
-                    return false;
-                for (int i = 0; i < materials.Length; i++)
-                    if (materials[i] != other.materials[i])
-                        return false;
-                return true;
+                return mesh == other.mesh
+                    && DeepCompareArrays(materials, other.materials);
             }
 
             public override readonly int GetHashCode()
