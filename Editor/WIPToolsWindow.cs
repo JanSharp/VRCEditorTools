@@ -172,10 +172,11 @@ namespace JanSharp
             Foldout foldout = new Foldout() { text = "Replace Meshes With Prefabs From Folder", value = false };
 
             foldout.Add(
-                new Label("Builds a lookup table from all meshes used by mesh filters for each given prefab in the given folder recursively.\n"
-                    + "Then goes through all mesh filters in the scene, checks if they are not part of a prefab instance, and if the "
-                    + "mesh they are using exists in one of the given prefabs, that object in the scene will get replaced with "
-                    + "the prefab.\n"
+                new Label("Builds a lookup table from all meshes and their associated materials for "
+                    + "each given prefab in the given folder recursively.\n"
+                    + "Then goes through all mesh filters in the scene, checks if they are not part of a prefab instance, "
+                    + "and if their mesh plus associated materials exists in one of the given prefabs, "
+                    + "that object in the scene will get replaced with the prefab.\n"
                     + "It makes sure to walk up in the hierarchy, which is to say the mesh filters can be children within each prefab.")
                 { style = { whiteSpace = WhiteSpace.Normal } });
 
@@ -196,8 +197,8 @@ namespace JanSharp
                 if (!Directory.Exists(folderPathField.text))
                     return;
 
-                Dictionary<Mesh, (GameObject prefab, int hierarchyDepth)> meshesToPrefabsLut = new();
-                HashSet<Mesh> reusedMeshes = new();
+                Dictionary<MeshAndMaterials, (GameObject prefab, int hierarchyDepth)> meshesToPrefabsLut = new();
+                HashSet<MeshAndMaterials> reusedMeshes = new();
 
                 int GetHierarchyDepth(Transform t)
                 {
@@ -213,14 +214,17 @@ namespace JanSharp
                 void RegisterMesh(MeshFilter meshFilter, GameObject prefab)
                 {
                     Mesh mesh = meshFilter.sharedMesh;
-                    if (mesh == null || reusedMeshes.Contains(mesh))
+                    if (mesh == null)
                         return;
-                    if (meshesToPrefabsLut.Remove(mesh))
+                    MeshAndMaterials key = new(meshFilter);
+                    if (reusedMeshes.Contains(key))
+                        return;
+                    if (meshesToPrefabsLut.Remove(key))
                     {
-                        reusedMeshes.Add(mesh);
+                        reusedMeshes.Add(key);
                         return;
                     }
-                    meshesToPrefabsLut.Add(mesh, (prefab, GetHierarchyDepth(meshFilter.transform)));
+                    meshesToPrefabsLut.Add(key, (prefab, GetHierarchyDepth(meshFilter.transform)));
                 }
 
                 // Build the lookup table.
@@ -289,7 +293,7 @@ namespace JanSharp
                     if (meshFilter == null // Objects get deleted (replaced) during the loop.
                         || meshFilter.sharedMesh == null
                         || PrefabUtility.IsPartOfPrefabInstance(meshFilter)
-                        || !meshesToPrefabsLut.TryGetValue(meshFilter.sharedMesh, out (GameObject prefab, int hierarchyDepth) toReplaceWith))
+                        || !meshesToPrefabsLut.TryGetValue(new MeshAndMaterials(meshFilter), out (GameObject prefab, int hierarchyDepth) toReplaceWith))
                     {
                         continue;
                     }
@@ -305,6 +309,43 @@ namespace JanSharp
             { text = "Replace" });
             box.Add(foldout);
             root.Add(box);
+        }
+
+        private readonly struct MeshAndMaterials : System.IEquatable<MeshAndMaterials>
+        {
+            public readonly Mesh mesh;
+            public readonly Material[] materials;
+
+            public MeshAndMaterials(MeshFilter meshFilter)
+            {
+                mesh = meshFilter.sharedMesh;
+                Renderer renderer = meshFilter.GetComponent<Renderer>();
+                materials = renderer == null ? new Material[0] : renderer.sharedMaterials;
+            }
+
+            public override readonly bool Equals(object obj)
+            {
+                return obj is MeshAndMaterials meshAndMaterials && Equals(meshAndMaterials);
+            }
+
+            public readonly bool Equals(MeshAndMaterials other)
+            {
+                if (mesh != other.mesh || materials.Length != other.materials.Length)
+                    return false;
+                for (int i = 0; i < materials.Length; i++)
+                    if (materials[i] != other.materials[i])
+                        return false;
+                return true;
+            }
+
+            public override readonly int GetHashCode()
+            {
+                System.HashCode result = new();
+                result.Add(mesh);
+                foreach (Material material in materials)
+                    result.Add(material);
+                return result.ToHashCode();
+            }
         }
 
         private void AddVerticalSpacer(VisualElement parent)
