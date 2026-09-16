@@ -173,18 +173,21 @@ namespace JanSharp
 
             foldout.Add(
                 new Label("Builds a lookup table from all meshes used by mesh filters for each given prefab in the given folder.\n"
-                    + "Then goes through all mesh filters in the scene, checks if they are not a prefab instance, and if the "
+                    + "Then goes through all mesh filters in the scene, checks if they are not part of a prefab instance, and if the "
                     + "mesh they are using exists in one of the given prefabs, that object in the scene will get replaced with "
                     + "the prefab.\n"
                     + "It makes sure to walk up in the hierarchy, which is to say the mesh filters can be children within each prefab.")
                 { style = { whiteSpace = WhiteSpace.Normal } });
 
-            TextField folderPathField = new TextField("Folder with Prefabs");
+            TextField folderPathField = new TextField("Folder with Prefabs")
+            {
+                tooltip = "Full path relative to the root of the project, like Assets/Foo/Bar",
+            };
+            Toggle keepOriginalCountPostfixToggle = new Toggle("Keep Original (#) Postfix") { value = true };
             Toggle keepOriginalNameToggle = new Toggle("Keep Original Name");
-            Toggle keepOriginalCountPostfixToggle = new Toggle("Keep Original Count Prefix") { value = true };
             foldout.Add(folderPathField);
-            foldout.Add(keepOriginalNameToggle);
             foldout.Add(keepOriginalCountPostfixToggle);
+            foldout.Add(keepOriginalNameToggle);
 
             foldout.Add(new Button(() =>
             {
