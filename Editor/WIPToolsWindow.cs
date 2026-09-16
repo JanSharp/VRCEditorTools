@@ -172,7 +172,7 @@ namespace JanSharp
             Foldout foldout = new Foldout() { text = "Replace Meshes With Prefabs From Folder", value = false };
 
             foldout.Add(
-                new Label("Builds a lookup table from all meshes used by mesh filters for each given prefab in the given folder.\n"
+                new Label("Builds a lookup table from all meshes used by mesh filters for each given prefab in the given folder recursively.\n"
                     + "Then goes through all mesh filters in the scene, checks if they are not part of a prefab instance, and if the "
                     + "mesh they are using exists in one of the given prefabs, that object in the scene will get replaced with "
                     + "the prefab.\n"
@@ -196,7 +196,7 @@ namespace JanSharp
                 if (!Directory.Exists(folderPathField.text))
                     return;
 
-                Dictionary<Mesh, (GameObject prefab, int hierarchyDepth)> meshesToPrefabs = new();
+                Dictionary<Mesh, (GameObject prefab, int hierarchyDepth)> meshesToPrefabsLut = new();
                 HashSet<Mesh> reusedMeshes = new();
 
                 int GetHierarchyDepth(Transform t)
@@ -210,59 +210,61 @@ namespace JanSharp
                     return depth;
                 }
 
-                void LogWarningForReusedMesh(Mesh mesh, GameObject prefab)
-                {
-                    Debug.LogWarning($"Ignoring mesh {AssetDatabase.GetAssetPath(mesh)}, used by multiple prefabs "
-                        + $"- prefab: {AssetDatabase.GetAssetPath(prefab)}", prefab);
-                }
-
                 void RegisterMesh(MeshFilter meshFilter, GameObject prefab)
                 {
                     Mesh mesh = meshFilter.sharedMesh;
-                    if (mesh == null)
+                    if (mesh == null || reusedMeshes.Contains(mesh))
                         return;
-                    if (reusedMeshes.Contains(mesh))
+                    if (meshesToPrefabsLut.Remove(mesh))
                     {
-                        LogWarningForReusedMesh(mesh, prefab);
-                        return;
-                    }
-                    if (meshesToPrefabs.ContainsKey(mesh))
-                    {
-                        LogWarningForReusedMesh(mesh, meshesToPrefabs[mesh].prefab);
-                        LogWarningForReusedMesh(mesh, prefab);
-                        meshesToPrefabs.Remove(mesh);
                         reusedMeshes.Add(mesh);
                         return;
                     }
-                    meshesToPrefabs.Add(mesh, (prefab, GetHierarchyDepth(meshFilter.transform)));
+                    meshesToPrefabsLut.Add(mesh, (prefab, GetHierarchyDepth(meshFilter.transform)));
                 }
 
                 // Build the lookup table.
 
-                foreach (string filePath in Directory.EnumerateFiles(folderPathField.text))
+                HashSet<GameObject> allPrefabs = new();
+
+                void WalkDirectory(string dirPath)
                 {
-                    if (Path.GetExtension(filePath) != ".prefab")
-                        continue;
-                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filePath);
-                    foreach (MeshFilter meshFilter in prefab.GetComponentsInChildren<MeshFilter>(includeInactive: true))
-                        RegisterMesh(meshFilter, prefab);
+                    foreach (string subDirPath in Directory.EnumerateDirectories(dirPath))
+                        WalkDirectory(subDirPath);
+                    foreach (string filePath in Directory.EnumerateFiles(dirPath))
+                    {
+                        if (Path.GetExtension(filePath) != ".prefab")
+                            continue;
+                        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filePath);
+                        if (prefab == null)
+                            continue;
+                        allPrefabs.Add(prefab);
+                        foreach (MeshFilter meshFilter in prefab.GetComponentsInChildren<MeshFilter>(includeInactive: true))
+                            RegisterMesh(meshFilter, prefab);
+                    }
                 }
+                WalkDirectory(folderPathField.text);
+
+                foreach (var registered in meshesToPrefabsLut.Values)
+                    allPrefabs.Remove(registered.prefab);
+                foreach (GameObject prefab in allPrefabs)
+                    Debug.LogWarning($"Cannot uniquely identify the prefab {prefab.name} - {AssetDatabase.GetAssetPath(prefab)}", prefab);
 
                 // Go through the scene.
 
-                bool TryReplace(GameObject toReplace, GameObject prefab, bool recordUndo)
+                bool TryReplace(GameObject toReplace, GameObject prefab)
                 {
                     GameObject to = (GameObject)PrefabUtility.InstantiatePrefab(prefab, toReplace.transform.parent);
                     if (to == null)
                         return false;
-                    if (recordUndo)
+                    if (recordUndoToggle.value)
                         Undo.RegisterCreatedObjectUndo(to, $"replace object with '{prefab.name}'");
                     to.transform.SetSiblingIndex(toReplace.transform.GetSiblingIndex());
                     BulkReplaceWindow.ChangeName(toReplace, to, keepOriginalNameToggle.value, keepOriginalCountPostfixToggle.value);
                     to.transform.localPosition = toReplace.transform.localPosition;
                     to.transform.localRotation = toReplace.transform.localRotation;
                     to.transform.localScale = toReplace.transform.localScale;
-                    if (recordUndo)
+                    if (recordUndoToggle.value)
                         Undo.DestroyObjectImmediate(toReplace);
                     else
                         DestroyImmediate(toReplace);
@@ -287,14 +289,14 @@ namespace JanSharp
                     if (meshFilter == null // Objects get deleted (replaced) during the loop.
                         || meshFilter.sharedMesh == null
                         || PrefabUtility.IsPartOfPrefabInstance(meshFilter)
-                        || !meshesToPrefabs.TryGetValue(meshFilter.sharedMesh, out (GameObject prefab, int hierarchyDepth) toReplaceWith))
+                        || !meshesToPrefabsLut.TryGetValue(meshFilter.sharedMesh, out (GameObject prefab, int hierarchyDepth) toReplaceWith))
                     {
                         continue;
                     }
                     Transform rootToReplace = GetNthParent(meshFilter.transform, toReplaceWith.hierarchyDepth);
                     if (rootToReplace == null)
                         continue;
-                    if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab, recordUndoToggle.value))
+                    if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab))
                         replacedCount++;
                 }
 
