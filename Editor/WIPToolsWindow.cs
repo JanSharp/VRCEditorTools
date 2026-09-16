@@ -171,7 +171,8 @@ namespace JanSharp
             Box box = new Box();
             Foldout foldout = new Foldout() { text = "Replace Meshes With Prefabs From Folder", value = false };
 
-            foldout.Add(
+            Foldout infoFoldout = new Foldout() { text = "Info", value = true };
+            infoFoldout.Add(
                 new Label("- Builds a lookup table from all meshes and their associated materials for "
                     + "each given prefab in the given folder recursively.\n"
                     + "- Then goes through all mesh filters in the scene, checks if they are not part of a prefab instance, "
@@ -184,6 +185,7 @@ namespace JanSharp
                     + "- In the case of multiple prefabs potentially matching a given mesh filter, "
                     + "it tries the larger prefabs first (larger meaning more depth).")
                 { style = { whiteSpace = WhiteSpace.Normal } });
+            foldout.Add(infoFoldout);
 
             TextField folderPathField = new TextField("Folder with Prefabs")
             {
