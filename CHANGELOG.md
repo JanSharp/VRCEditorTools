@@ -1,6 +1,13 @@
 
 # Changelog
 
+## [1.3.13] - 2026-09-16
+
+### Changed
+
+- Make mass replacement undo recording optional ([`f409a55`](https://github.com/JanSharp/VRCEditorTools/commit/f409a55af196ef78e14548847bd6da67c053f5f3))
+- Improve mass replacement docs ([`f226d2d`](https://github.com/JanSharp/VRCEditorTools/commit/f226d2ddccf51e7596feb6feaef5e8fddb8d3b18))
+
 ## [1.3.12] - 2026-09-16
 
 ### Changed
@@ -232,6 +239,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.13]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.13
 [1.3.12]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.12
 [1.3.11]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.11
 [1.3.10]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.10
