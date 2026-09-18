@@ -362,8 +362,11 @@ namespace JanSharp
             if (left.Length != right.Length)
                 return false;
             for (int i = 0; i < left.Length; i++)
-                if (!left[i].Equals(right[i]))
+            {
+                int nullCount = (left[i] == null ? 1 : 0) + (right[i] == null ? 1 : 0);
+                if (nullCount == 1 || (nullCount == 0 && !left[i].Equals(right[i])))
                     return false;
+            }
             return true;
         }
 
