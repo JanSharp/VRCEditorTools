@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -183,7 +184,12 @@ namespace JanSharp
                     + "- It compares if the mesh filters and associated materials in the hierarchy to replace match "
                     + "that of the prefab before replacing.\n"
                     + "- In the case of multiple prefabs potentially matching a given mesh filter, "
-                    + "it tries the larger prefabs first (larger meaning more depth).")
+                    + "it tries the larger prefabs first (larger meaning more depth).\n"
+                    + $"- The {nameof(KeepAdditionalObjectsAsOverrides)} component can be added to an EditorOnly "
+                    + "tagged object anywhere in a prefab. At that location in the hierarchy, additional objects "
+                    + "are accepted and will be replaced with a prefab instance, however those additional objects "
+                    + "will not be deleted, rather they will be kept as prefab overrides. Unfortunately undo can end "
+                    + "up eating objects moved in this manner, which is annoying.")
                 { style = { whiteSpace = WhiteSpace.Normal } });
             foldout.Add(infoFoldout);
 
@@ -268,6 +274,63 @@ namespace JanSharp
 
                 // Go through the scene.
 
+                Stack<int> childIndexStack = new();
+                // childIndexes are reversed, because of Stack.ToArray().
+                List<(int[] childIndexes, Transform toKeep)> toKeep = new();
+                List<Transform> destinationSiblings = new();
+                Dictionary<Transform, int> destinationSiblingVisitedCount = new();
+
+                Transform GetInnerChild(Transform t, int[] childIndexes)
+                {
+                    for (int i = childIndexes.Length - 1; i >= 0; i--)
+                        t = t.GetChild(childIndexes[i]);
+                    return t;
+                }
+
+                void MoveAdditionalObjectsToKeep(Transform destinationRoot)
+                {
+                    if (toKeep.Count == 0)
+                        return;
+                    foreach (var keep in toKeep)
+                    {
+                        Transform destinationSibling = GetInnerChild(destinationRoot, keep.childIndexes);
+                        destinationSiblings.Add(destinationSibling);
+                        if (!destinationSiblingVisitedCount.ContainsKey(destinationSibling))
+                            destinationSiblingVisitedCount.Add(destinationSibling, 0);
+                    }
+
+                    int GetSiblingIndexRelativeToDestination(Transform destinationSibling)
+                    {
+                        // Undo.SetSiblingIndex appears to only work so long as no other objects get
+                        // inserted at a lower index afterwards, which is why it is important for lowest indexes
+                        // to come first, and offsets growing when inserting multiple after the same sibling.
+                        // ... well, never mind, undoing still ends up eating objects.
+                        // But at least they will retain original order when getting moved with this logic.
+                        int offset = destinationSiblingVisitedCount[destinationSibling] + 1;
+                        destinationSiblingVisitedCount[destinationSibling] = offset;
+                        return destinationSibling.GetSiblingIndex() + offset;
+                    }
+
+                    for (int i = 0; i < toKeep.Count; i++)
+                    {
+                        var keep = toKeep[i];
+                        Transform destinationSibling = destinationSiblings[i];
+                        if (recordUndoToggle.value)
+                        {
+                            Undo.SetTransformParent(keep.toKeep, destinationSibling.parent, "moved child for replacement");
+                            Undo.SetSiblingIndex(keep.toKeep, GetSiblingIndexRelativeToDestination(destinationSibling), "moved child for replacement");
+                        }
+                        else
+                        {
+                            keep.toKeep.SetParent(destinationSibling.parent, worldPositionStays: true);
+                            keep.toKeep.SetSiblingIndex(GetSiblingIndexRelativeToDestination(destinationSibling));
+                        }
+                    }
+                    toKeep.Clear();
+                    destinationSiblings.Clear();
+                    destinationSiblingVisitedCount.Clear();
+                }
+
                 bool TryReplace(GameObject toReplace, GameObject prefab)
                 {
                     GameObject to = (GameObject)PrefabUtility.InstantiatePrefab(prefab, toReplace.transform.parent);
@@ -280,6 +343,9 @@ namespace JanSharp
                     to.transform.localPosition = toReplace.transform.localPosition;
                     to.transform.localRotation = toReplace.transform.localRotation;
                     to.transform.localScale = toReplace.transform.localScale;
+
+                    MoveAdditionalObjectsToKeep(to.transform);
+
                     if (recordUndoToggle.value)
                         Undo.DestroyObjectImmediate(toReplace);
                     else
@@ -298,10 +364,96 @@ namespace JanSharp
                     return t;
                 }
 
+                bool CompareAndPushPopIndex(int leftIndex, System.Func<bool> compare)
+                {
+                    childIndexStack.Push(leftIndex);
+                    bool result = compare();
+                    childIndexStack.Pop();
+                    return result;
+                }
+
+                bool MatchAgainstFilter(KeepAdditionalObjectsAsOverrides filter, Transform right)
+                {
+                    if (filter.regularExpressions.Length == 0)
+                        return true;
+                    return filter.regularExpressions.Any(regex => Regex.IsMatch(right.name, regex));
+                }
+
+                bool MatchAgainstFilterAndRemember(KeepAdditionalObjectsAsOverrides filter, Transform right)
+                {
+                    if (!MatchAgainstFilter(filter, right))
+                        return false;
+                    toKeep.Add((childIndexStack.ToArray(), right));
+                    return true;
+                }
+
+                // left must be the prefab.
+                bool DeepCompareChildren(Transform leftParent, Transform rightParent)
+                {
+                    int leftIndex = 0;
+                    int rightIndex = 0;
+                    KeepAdditionalObjectsAsOverrides activeFilter = null;
+                    bool prevWasFilter = false;
+                    while (true)
+                    {
+                        if (leftIndex >= leftParent.childCount)
+                            break;
+                        Transform left = leftParent.GetChild(leftIndex++);
+                        KeepAdditionalObjectsAsOverrides filter = left.GetComponent<KeepAdditionalObjectsAsOverrides>();
+                        if (filter != null)
+                        {
+                            if (prevWasFilter)
+                                Debug.LogWarning($"Consecutive {nameof(KeepAdditionalObjectsAsOverrides)} may "
+                                    + $"behave unexpectedly, only the last in the chain will be used.");
+                            activeFilter = filter;
+                            prevWasFilter = true;
+                            continue;
+                        }
+                        prevWasFilter = false;
+
+                        if (rightIndex >= rightParent.childCount)
+                            return false;
+
+                        do
+                        {
+                            Transform right = rightParent.GetChild(rightIndex++);
+                            if (CompareAndPushPopIndex(leftIndex - 1, () => DeepCompareTransforms(left, right)))
+                            {
+                                activeFilter = null;
+                                break;
+                            }
+
+                            if (activeFilter == null)
+                                return false;
+                            // -2 because the filter came before the current left.
+                            if (!CompareAndPushPopIndex(leftIndex - 2, () => MatchAgainstFilterAndRemember(activeFilter, right)))
+                                break;
+                        }
+                        while (rightIndex < rightParent.childCount);
+                    }
+
+                    if (rightIndex >= rightParent.childCount)
+                        return true;
+
+                    if (activeFilter == null)
+                        return false;
+
+                    // Match the rest of the right side against the filter.
+                    return CompareAndPushPopIndex(leftIndex - 1, () =>
+                    {
+                        while (rightIndex < rightParent.childCount)
+                            if (!MatchAgainstFilterAndRemember(activeFilter, rightParent.GetChild(rightIndex++)))
+                                return false;
+                        return true;
+                    });
+                }
+
                 bool CompareMeshFilters(MeshFilter left, MeshFilter right)
                 {
                     if (left == null)
                         return right == null;
+                    if (right == null)
+                        return false;
                     return left.sharedMesh == right.sharedMesh;
                 }
 
@@ -309,21 +461,29 @@ namespace JanSharp
                 {
                     if (left == null)
                         return right == null;
+                    if (right == null)
+                        return false;
                     return DeepCompareArrays(left.sharedMaterials, right.sharedMaterials);
                 }
 
+                // left must be the prefab.
                 bool DeepCompareTransforms(Transform left, Transform right)
                 {
-                    if (left.childCount != right.childCount)
-                        return false;
                     if (!CompareMeshFilters(left.GetComponent<MeshFilter>(), right.GetComponent<MeshFilter>()))
                         return false;
                     if (!CompareRenderers(left.GetComponent<Renderer>(), right.GetComponent<Renderer>()))
                         return false;
-                    for (int i = 0; i < left.childCount; i++)
-                        if (!DeepCompareTransforms(left.GetChild(i), right.GetChild(i)))
-                            return false;
+                    if (!DeepCompareChildren(left, right))
+                        return false;
                     return true;
+                }
+
+                bool DeepCompareRoots(Transform prefab, Transform toReplace)
+                {
+                    if (DeepCompareTransforms(prefab, toReplace))
+                        return true;
+                    toKeep.Clear();
+                    return false;
                 }
 
                 int replacedCount = 0;
@@ -340,7 +500,7 @@ namespace JanSharp
                     foreach (PrefabToReplaceWith toReplaceWith in potentialPrefabs)
                     {
                         Transform rootToReplace = GetNthParent(meshFilter.transform, toReplaceWith.hierarchyDepth);
-                        if (rootToReplace == null || !DeepCompareTransforms(rootToReplace, toReplaceWith.prefab.transform))
+                        if (rootToReplace == null || !DeepCompareRoots(toReplaceWith.prefab.transform, rootToReplace))
                             continue;
                         if (TryReplace(rootToReplace.gameObject, toReplaceWith.prefab))
                             replacedCount++;
