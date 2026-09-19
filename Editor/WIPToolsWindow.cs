@@ -394,10 +394,8 @@ namespace JanSharp
                     int rightIndex = 0;
                     KeepAdditionalObjectsAsOverrides activeFilter = null;
                     bool prevWasFilter = false;
-                    while (true)
+                    while (leftIndex < leftParent.childCount)
                     {
-                        if (leftIndex >= leftParent.childCount)
-                            break;
                         Transform left = leftParent.GetChild(leftIndex++);
                         KeepAdditionalObjectsAsOverrides filter = left.GetComponent<KeepAdditionalObjectsAsOverrides>();
                         if (filter != null)
