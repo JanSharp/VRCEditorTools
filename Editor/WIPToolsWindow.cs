@@ -53,6 +53,8 @@ namespace JanSharp
                 string assetPath = AssetDatabase.GetAssetPath(prefabObjField.value);
                 if (assetPath == null)
                     return;
+                // TODO: Test using this:
+                // GameObject[] objs = PrefabUtility.FindAllInstancesOfPrefab((GameObject)prefabObjField.value);
                 GameObject[] objs = FindPrefabInstances(assetPath);
                 SearchIntoSelectionStage(objs);
             })
