@@ -32,4 +32,5 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
   - Find materials using a given texture
   - Generate hidden_changes.conf containing all UdonSharpProgram asset files
   - Rather specific purpose made bulk replacement of objects with associated prefabs
+  - Resolve Udon Exception file and line
 - Context menu item when right clicking objects in the hierarchy to move previously selected objects into the right clicked object as children

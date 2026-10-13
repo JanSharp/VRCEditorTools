@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -8,6 +9,13 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using UdonSharpEditor;
+
+#if VRCHAT_WORLD
+using UdonSharp;
+using UdonSharp.Compiler;
+using VRC.Udon;
+#endif
 
 namespace JanSharp
 {
@@ -575,6 +583,130 @@ namespace JanSharp
             }
         }
 
+#if VRCHAT_WORLD
+        private static Dictionary<long, (string assetPath, UdonSharpProgramAsset programAsset)> scriptsByScriptId = null;
+
+        private void CreateResolveUdonExceptionFileAndLineGUI()
+        {
+            Box box = new Box();
+            Foldout foldout = new Foldout() { text = "Resolve Udon Exception File And Line", value = false };
+
+            foldout.Add(
+                new Label("- Paste an Udon Exception error message which includes the Program Counter "
+                    + "and the first two lines of the Heap Dump from a log file into the text field below.\n"
+                    + "- Hit the Resolve and it will write a message to the console which upon double clicking "
+                    + "will jump to the appropriate line in the source file.")
+                { style = { whiteSpace = WhiteSpace.Normal } });
+
+            BindingFlags staticBindingFlags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
+            BindingFlags instanceBindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            void BuildScriptLut()
+            {
+                if (scriptsByScriptId != null)
+                    return;
+                scriptsByScriptId = new();
+
+                MethodInfo getSerializedProgramAssetWithoutRefreshMethod = typeof(UdonSharpProgramAsset)
+                    .GetMethod("GetSerializedProgramAssetWithoutRefresh", instanceBindingFlags);
+
+                AbstractSerializedUdonProgramAsset GetSerializedProgramAssetWithoutRefresh(UdonSharpProgramAsset programAsset)
+                    => (AbstractSerializedUdonProgramAsset)getSerializedProgramAssetWithoutRefreshMethod.Invoke(programAsset, null);
+
+                foreach (UdonSharpProgramAsset programAsset in UdonSharpProgramAsset.GetAllUdonSharpPrograms())
+                {
+                    if (programAsset.sourceCsScript == null)
+                        continue;
+                    if (GetSerializedProgramAssetWithoutRefresh(programAsset) == null)
+                        continue;
+
+                    long scriptID = programAsset.scriptID;
+                    if (scriptID == 0 || scriptsByScriptId.ContainsKey(scriptID))
+                        continue;
+
+                    scriptsByScriptId.Add(scriptID, (AssetDatabase.GetAssetPath(programAsset.sourceCsScript), programAsset));
+                }
+            }
+
+            TextField errorMessageField = new TextField(maxLength: int.MaxValue, multiline: true, isPasswordField: false, '*');
+
+            VisualElement buttons = new VisualElement()
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    marginTop = 4f,
+                    marginBottom = 4f,
+                },
+            };
+
+            buttons.Add(new Button(() =>
+            {
+                string errorMessage = errorMessageField.value;
+
+                Match programCounterMatch = Regex.Match(errorMessage, @"Program Counter was at: (?<counter>\d+)");
+                Match programTypeMatch = Regex.Match(errorMessage, @"
+                        Heap\ Dump:\s+
+                        \dx\d+:\s+(?<scriptID>\-?\d+)\s+
+                        \dx\d+:\s+(?<programName>[^\r\n]+)",
+                    RegexOptions.IgnorePatternWhitespace);
+
+                if (!programCounterMatch.Success
+                    || !programTypeMatch.Success
+                    || !int.TryParse(programCounterMatch.Groups["counter"].Value, out int programCounter)
+                    || !long.TryParse(programTypeMatch.Groups["scriptID"].Value, out long scriptID))
+                {
+                    Debug.LogWarning($"Cannot find program counter and script id in given error message.");
+                    return;
+                }
+                string programName = programTypeMatch.Groups["programName"].Value;
+
+                BuildScriptLut();
+                if (!scriptsByScriptId.TryGetValue(scriptID, out var assetInfo) || assetInfo.programAsset == null)
+                {
+                    Debug.LogWarning($"Cannot find the script {programName} ({scriptID}) in this project. "
+                        + $"If it should find it, press the Clear Script Id Cache button.");
+                    return;
+                }
+
+                System.Type udonSharpEditorCacheType = typeof(AssemblyDebugInfo).Assembly.GetType("UdonSharp.UdonSharpEditorCache");
+                System.Type debugInfoTypeType = udonSharpEditorCacheType.GetNestedType("DebugInfoType", BindingFlags.NonPublic | BindingFlags.Public);
+                object clientDebugInfoType = debugInfoTypeType.GetEnumValues().GetValue(System.Array.IndexOf(debugInfoTypeType.GetEnumNames(), "Client"));
+                object udonSharpEditorCacheInstance = udonSharpEditorCacheType
+                    .GetMethod("GetInstance", staticBindingFlags)
+                    .Invoke(null, null);
+                AssemblyDebugInfo debugInfo = (AssemblyDebugInfo)udonSharpEditorCacheType
+                    .GetMethod("GetDebugInfo", instanceBindingFlags)
+                    .Invoke(udonSharpEditorCacheInstance, new[] { assetInfo.programAsset, clientDebugInfoType });
+                if (debugInfo == null)
+                {
+                    Debug.LogWarning($"Could not get debug info for {programName} ({scriptID}). I don't know what this means.");
+                    return;
+                }
+
+                debugInfo.GetPositionFromProgramCounter(programCounter, out string filePath, out string methodName, out int line, out int lineChar);
+
+                MethodInfo logInformationMethod = typeof(Debug).GetMethod("LogInformation", staticBindingFlags);
+                logInformationMethod.Invoke(null, new object[] {
+                    $"Resolved to {filePath}({line + 1},{lineChar + 1}) in {methodName}",
+                    filePath,
+                    line + 1,
+                    lineChar + 1,
+                });
+            })
+            { text = "Resolve", style = { flexGrow = 1f } });
+
+            buttons.Add(new Button(() => scriptsByScriptId = null) { text = "Clear Script Id Cache", style = { flexGrow = 1f } });
+
+            foldout.Add(buttons);
+            foldout.Add(new Label("Error Message:"));
+            foldout.Add(errorMessageField);
+
+            box.Add(foldout);
+            root.Add(box);
+        }
+#endif
+
         private void AddVerticalSpacer(VisualElement parent)
         {
             parent.Add(new VisualElement() { style = { height = 4 } });
@@ -590,6 +722,10 @@ namespace JanSharp
             CreateGenerateHiddenChangesConfGUI();
             AddVerticalSpacer(root);
             CreateReplaceMeshesWithPrefabsFromFolderGUI();
+#if VRCHAT_WORLD
+            AddVerticalSpacer(root);
+            CreateResolveUdonExceptionFileAndLineGUI();
+#endif
             rootVisualElement.Add(root);
         }
     }
