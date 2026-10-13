@@ -594,7 +594,7 @@ namespace JanSharp
             foldout.Add(
                 new Label("- Paste an Udon Exception error message which includes the Program Counter "
                     + "and the first two lines of the Heap Dump from a log file into the text field below.\n"
-                    + "- Hit the Resolve and it will write a message to the console which upon double clicking "
+                    + "- Click Resolve and it will write a message to the console which upon double clicking "
                     + "will jump to the appropriate line in the source file.")
                 { style = { whiteSpace = WhiteSpace.Normal } });
 
