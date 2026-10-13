@@ -30,4 +30,6 @@ Head to my [VCC Listing](https://jansharp.github.io/vrc/vcclisting.xhtml) and fo
 - WIP Tools Window, tool which may be useful however they may not be in their final state or location, or they aren't the best quality wise
   - Find instances of a given prefab in the scene
   - Find materials using a given texture
+  - Generate hidden_changes.conf containing all UdonSharpProgram asset files
+  - Rather specific purpose made bulk replacement of objects with associated prefabs
 - Context menu item when right clicking objects in the hierarchy to move previously selected objects into the right clicked object as children
