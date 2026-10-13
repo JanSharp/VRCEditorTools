@@ -1,6 +1,16 @@
 
 # Changelog
 
+## [1.3.17] - 2026-10-13
+
+### Changed
+
+- Update readme to mention hidden_changes.conf generator and purpose made bulk replacement WIP tools ([`7f8ae05`](https://github.com/JanSharp/VRCEditorTools/commit/7f8ae053cfa8b1caa4dc4eceb12cc645018fd482))
+
+### Added
+
+- Add Udon Exception file and line resolver WIP tool ([`7945db9`](https://github.com/JanSharp/VRCEditorTools/commit/7945db9580b045fa21cc498d5882b595ebb05e46))
+
 ## [1.3.16] - 2026-09-19
 
 ### Added
@@ -265,6 +275,7 @@ _This package got split off of [com.jansharp.common v0.2.1](https://github.com/J
 - Add bulk replace tool ([`5513871`](https://github.com/JanSharp/VRCEditorTools/commit/55138716cbe527f956ae90b1a8b5a17ae1a21cef))
 - Add UI Color Changer and Occlusion Visibility Window by splitting com.jansharp.common ([`2d7f2f5`](https://github.com/JanSharp/VRCEditorTools/commit/2d7f2f5c36f5f492514b5540125de2d31882b1fd))
 
+[1.3.17]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.17
 [1.3.16]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.16
 [1.3.15]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.15
 [1.3.14]: https://github.com/JanSharp/VRCEditorTools/releases/tag/v1.3.14
